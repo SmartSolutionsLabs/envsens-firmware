@@ -3,6 +3,8 @@
 
 #define BLUETOOTH_DEVICE_NAME "Hensor Env"
 
+#include <Arduino.h>
+
 /**
  * This class has all data and logic.
  * It's singleton.
@@ -28,6 +30,10 @@ class Hensor {
 		bool getOldBluetoothDeviceConnected() const;
 		void setBluetoothDeviceConnected(bool connected);
 		void setOldBluetoothDeviceConnected(bool connected);
+
+		// About WiFi
+		void getWifiCredentials(String &ssid, String &password) const;
+		void setWifiCredentials(String &ssid, String &password);
 };
 
 #endif
