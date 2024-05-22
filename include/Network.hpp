@@ -11,6 +11,9 @@ class Network {
 	protected:
 		static Network * network;
 		Network();
+
+		static uint32_t remainingAttempts;
+
 	public:
 		void operator=(const Network &) = delete;
 		static Network * getInstance();
@@ -24,7 +27,14 @@ class Network {
 
 		static void onDisconnected(WiFiEvent_t event, WiFiEventInfo_t info);
 
+		/**
+		 * Call it when change the credentials.
+		 */
 		void connect();
+
+		// credentials caché
+		static String SSID;
+		static String PASSWORD;
 };
 
 #endif

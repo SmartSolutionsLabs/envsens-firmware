@@ -1,5 +1,7 @@
 #include "Network.hpp"
-#include "Hensor.hpp"
+
+String Network::SSID;
+String Network::PASSWORD;
 
 Network * Network::network = nullptr;
 
@@ -14,9 +16,9 @@ Network * Network::getInstance() {
 Network::Network() : server(80) {
 	WiFi.mode(WIFI_STA);
 
-	//~ server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-		//~ request->send(200, "text/plain", "This is the ESP server.");
-	//~ });
+	server.on("/", HTTP_GET, [](AsyncWebServerRequest * request) {
+		request->send(200, "text/plain", "This is the ESP HTTP server.");
+	});
 
 	// Start AsyncElegantOTA
 	ElegantOTA.begin(&server);
@@ -58,15 +60,27 @@ void Network::onAddressed(WiFiEvent_t event, WiFiEventInfo_t info) {
 
 void Network::onDisconnected(WiFiEvent_t event, WiFiEventInfo_t info) {
 	Serial.print("WiFi.disconnected\n");
-	String ssid;
-	String password;
-	Hensor::getInstance()->getWifiCredentials(ssid, password);
-	WiFi.begin(ssid, password);
+
+	if(Network::SSID == "" || Network::PASSWORD == "") {
+		Serial.print("No net credentials.");
+		return;
+	}
+
+	// Reattempt the connection
+	if(--Network::remainingAttempts != 0) {
+		WiFi.begin(Network::SSID, Network::PASSWORD);
+	}
 }
 
 void Network::connect() {
-	String ssid;
-	String password;
-	Hensor::getInstance()->getWifiCredentials(ssid, password);
-	WiFi.begin(ssid, password);
+	if(Network::SSID == "" || Network::PASSWORD == "") {
+		Serial.print("No net credentials.");
+		return;
+	}
+
+	// Reset the counter
+	Network::remainingAttempts = 4;
+
+	// Attempt the connection
+	WiFi.begin(Network::SSID, Network::PASSWORD);
 }
