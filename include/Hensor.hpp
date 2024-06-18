@@ -25,6 +25,8 @@ class Hensor {
 
 		void operator=(const Hensor &) = delete;
 
+		void processMessage(String message);
+
 		// About Bluetooth
 		bool getBluetoothDeviceConnected() const;
 		bool getOldBluetoothDeviceConnected() const;

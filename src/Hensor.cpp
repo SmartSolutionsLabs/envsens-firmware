@@ -13,6 +13,10 @@ Hensor * Hensor::getInstance() {
 Hensor::Hensor() {
 }
 
+void Hensor::processMessage(String message) {
+	Serial.println(message);
+}
+
 bool Hensor::getBluetoothDeviceConnected() const {
 	return this->bluetoothDeviceConnected;
 }

@@ -1,5 +1,6 @@
 #include "BleMessageListener.hpp"
 #include "Ble.hpp"
+#include "Hensor.hpp"
 
 BleMessageListener::BleMessageListener() {
 }
@@ -8,7 +9,7 @@ void BleMessageListener::onWrite(BLECharacteristic * characteristic) {
 	String input(characteristic->getValue().c_str());
 	if(input.length() > 0){
 		Serial.print("\tBleListened\n\t");
-		Serial.println(input);
+		Hensor::getInstance()->processMessage(input);
 	}
 }
 
