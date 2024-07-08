@@ -3,7 +3,6 @@
 
 #include <Arduino.h>
 
-#include "Control.hpp"
 #include "esp_task_wdt.h"
 
 class Thread {
@@ -13,8 +12,6 @@ class Thread {
 		const int taskPriority = 1;
 		const char * name;
 
-		Control * control;
-
 	public:
 		Thread(const char * name, int taskCore = 0);
 
@@ -23,8 +20,6 @@ class Thread {
 		void start();
 
 		void stop();
-
-		virtual void parseIncome(void * data) = 0;
 
 		virtual void run(void* data) = 0; // Make run pure virtual
 };
