@@ -2,6 +2,7 @@
 
 String Network::SSID;
 String Network::PASSWORD;
+uint32_t Network::remainingAttempts;
 
 Network * Network::network = nullptr;
 
