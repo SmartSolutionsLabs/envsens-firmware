@@ -15,6 +15,8 @@ class Thread {
 	public:
 		Thread(const char * name, int taskCore = 0);
 
+		Thread();
+
 		static void runTask(void* data);
 
 		void start();
