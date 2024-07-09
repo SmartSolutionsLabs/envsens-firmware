@@ -7,7 +7,7 @@
  */
 class Communicator : public Thread {
 	protected:
-		static Communicator * motor;
+		static Communicator * communicator;
 		Communicator();
 		Communicator(const char * name);
 
