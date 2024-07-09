@@ -6,6 +6,10 @@
 #include <ESPAsyncWebServer.h>
 #include <ElegantOTA.h>
 
+#ifndef MAX_ATTEMPTS_QUANTITY
+#define MAX_ATTEMPTS_QUANTITY 4
+#endif
+
 class Network {
 	private:
 	protected:
