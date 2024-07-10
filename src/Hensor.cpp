@@ -36,7 +36,11 @@ void Hensor::processMessage(String message) {
 }
 
 Sensor * Hensor::getSensor(unsigned int index) const {
-	return this->sensors[index];
+	if (index < SENSORS_QUANTITY) {
+		return this->sensors[index];
+	}
+
+	return nullptr;
 }
 
 bool Hensor::getBluetoothDeviceConnected() const {
