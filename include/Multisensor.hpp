@@ -7,7 +7,7 @@
 
 class Multisensor : public Sensor {
 	protected:
-		Adafruit_BME680 sensor;
+		Adafruit_BME680 * sensor = nullptr;
 
 	public:
 		Multisensor(const char * name, int taskCore = 0);
