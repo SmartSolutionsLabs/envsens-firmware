@@ -3,7 +3,12 @@
 
 #include "Sensor.hpp"
 
+#include <SensirionI2CScd4x.h>
+
 class CO2sensor : public Sensor {
+	protected:
+		SensirionI2CScd4x sensor;
+
 	public:
 		CO2sensor(const char * name, int taskCore = 1);
 
