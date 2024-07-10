@@ -12,9 +12,9 @@ class Multisensor : public Sensor {
 	public:
 		Multisensor(const char * name, int taskCore = 0);
 
-		void connect(void * data);
+		void connect(void * data) override;
 
-		void run(void* data);
+		void run(void* data) override;
 };
 
 #endif

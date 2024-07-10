@@ -7,9 +7,9 @@ class NH3sensor : public Sensor {
 	public:
 		NH3sensor(const char * name, int taskCore = 1);
 
-		void connect(void * data);
+		void connect(void * data) override;
 
-		void run(void* data);
+		void run(void* data) override;
 };
 
 #endif
