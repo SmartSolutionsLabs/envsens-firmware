@@ -4,7 +4,9 @@ CO2sensor::CO2sensor(const char * name, int taskCore) : Sensor(name, taskCore) {
 }
 
 void CO2sensor::connect(void * data) {
-	this->sensor.begin((TwoWire&)data);
+	this->sensor = new SensirionI2CScd4x();
+
+	this->sensor->begin((TwoWire&)data);
 }
 
 void CO2sensor::run(void* data) {
@@ -19,7 +21,7 @@ void CO2sensor::run(void* data) {
 	while (1) {
 		vTaskDelay(xDelayIteration);
 
-		error = this->sensor.getDataReadyFlag(isDataReady);
+		error = this->sensor->getDataReadyFlag(isDataReady);
 
 		if (error) {
 			Serial.print("Error trying to getDataReadyFlag()\n");
@@ -29,7 +31,7 @@ void CO2sensor::run(void* data) {
 			continue;
 		}
 
-		error = this->sensor.readMeasurement(co2, temperature, humidity);
+		error = this->sensor->readMeasurement(co2, temperature, humidity);
 		if (error) {
 			Serial.print("Error trying to readMeasurement()\n");
 		}

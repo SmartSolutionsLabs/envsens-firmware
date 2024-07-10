@@ -7,7 +7,7 @@
 
 class CO2sensor : public Sensor {
 	protected:
-		SensirionI2CScd4x sensor;
+		SensirionI2CScd4x * sensor = nullptr;
 
 	public:
 		CO2sensor(const char * name, int taskCore = 1);
