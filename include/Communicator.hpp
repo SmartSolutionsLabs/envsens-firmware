@@ -1,6 +1,8 @@
 #ifndef INC_COMMUNICATOR
 #define INC_COMMUNICATOR
 
+#include "Thread.hpp"
+
 /**
  * Process every income and outcome.
  * It's a singleton transceiver.
@@ -10,6 +12,7 @@ class Communicator : public Thread {
 		static Communicator * communicator;
 		Communicator();
 		Communicator(const char * name);
+		Communicator(const char * name, int taskCore);
 
 	public:
 		// For singleton
@@ -25,7 +28,12 @@ class Communicator : public Thread {
 		/**
 		 * Sends data to exterior.
 		 */
-		void sendOut();
+		inline void sendOut();
+
+		/**
+		 * Checks if there are new logged data to send them out.
+		 */
+		void run(void * data) override;
 };
 
 #endif
