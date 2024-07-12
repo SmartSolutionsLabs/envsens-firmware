@@ -1,5 +1,2 @@
 .pio
 .vscode
-
-# Arduino Queue (https://github.com/sdesalas/Arduino-Queue.h/blob/master/Queue.h)
-include/Queue.h
