@@ -1,5 +1,7 @@
 #include "Communicator.hpp"
 
+#include <WiFi.h>
+
 Communicator * Communicator::communicator = nullptr;
 
 Communicator * Communicator::getInstance() {
@@ -11,6 +13,9 @@ Communicator * Communicator::getInstance() {
 }
 
 Communicator::Communicator(const char * name, int taskCore) : Thread(name, taskCore) {
+	WiFiClient wifiClient;
+
+	this->httpClient = new HttpClient(wifiClient);
 }
 
 void Communicator::parseIncome(void * data) {

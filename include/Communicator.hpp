@@ -3,6 +3,8 @@
 
 #include "Thread.hpp"
 
+#include <HttpClient.h>
+
 /**
  * Process every income and outcome.
  * It's a singleton transceiver.
@@ -13,6 +15,9 @@ class Communicator : public Thread {
 		Communicator();
 		Communicator(const char * name);
 		Communicator(const char * name, int taskCore);
+
+	private:
+		HttpClient * httpClient;
 
 	public:
 		// For singleton
