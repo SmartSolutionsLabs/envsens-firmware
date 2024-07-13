@@ -10,10 +10,8 @@ void Multisensor::connect(void * data) {
 }
 
 void Multisensor::run(void* data) {
-	TickType_t xDelayIteration = 1000 / portTICK_PERIOD_MS; // Iteration speed
-
 	while (1) {
-		vTaskDelay(xDelayIteration);
+		vTaskDelay(this->iterationDelay);
 
 		if (! this->sensor->performReading()) {
 			Serial.print("Failed to perform reading\n");

@@ -12,6 +12,11 @@ class Thread {
 		const int taskPriority = 1;
 		const char * name;
 
+		/**
+		 * Iteration speed.
+		 */
+		TickType_t iterationDelay = 1000 / portTICK_PERIOD_MS;;
+
 	public:
 		Thread(const char * name, int taskCore = 0);
 

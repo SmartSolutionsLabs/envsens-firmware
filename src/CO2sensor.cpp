@@ -10,8 +10,6 @@ void CO2sensor::connect(void * data) {
 }
 
 void CO2sensor::run(void* data) {
-	TickType_t xDelayIteration = 1000 / portTICK_PERIOD_MS; // Iteration speed
-
 	uint16_t error;
 	uint16_t co2 = 0;
 	float temperature = 0.0f;
@@ -19,7 +17,7 @@ void CO2sensor::run(void* data) {
 	bool isDataReady = false;
 
 	while (1) {
-		vTaskDelay(xDelayIteration);
+		vTaskDelay(this->iterationDelay);
 
 		error = this->sensor->getDataReadyFlag(isDataReady);
 
