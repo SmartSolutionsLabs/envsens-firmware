@@ -47,6 +47,11 @@ class Datalogger : public Thread {
 		 */
 		void append(uint32_t data);
 
+		/**
+		 * Fill the queue that must be empty with records.
+		 */
+		void acquire(ArduinoQueue<Datagas> &datagasQueue) const;
+
 	private:
 		inline void save();
 };

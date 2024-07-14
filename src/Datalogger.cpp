@@ -42,7 +42,7 @@ inline void Datalogger::save() {
 	}
 
 	Serial.print("Logging completed. Finalizing...\n");
-    if (!res) {
+	if (!res) {
 		res = dblog_finalize(&ctx);
 	}
 }
@@ -57,4 +57,45 @@ void Datalogger::append(uint32_t data) {
 	datagas.data = data;
 
 	this->queue.enqueue(datagas);
+}
+
+void Datalogger::acquire(ArduinoQueue<Datagas> &datagasQueue) const {
+	struct dblog_read_context rctx;
+	int res = dblog_read_init(&rctx);
+
+	static const int neverReadStatus = 0; // When never was read before
+	static const int alreadyReadStatus = 1;
+
+	res = dblog_bin_srch_row_by_val(&rctx, 1, DBLOG_TYPE_INT, (void *) &neverReadStatus, datagasQueue.itemCount(), 0);
+
+	if (res == DBLOG_RES_NOT_FOUND) {
+		Serial.print("No records found.\n");
+		return;
+	}
+	else if (res == 0) {
+		do {
+			// Create a Datagas object and fill it with data
+			Datagas datagas;
+			uint32_t col_type;
+			const void * unixtimeColumn = (time_t *) dblog_read_col_val(&rctx, 0, &col_type);
+			const void * dataColumn = (uint32_t *) dblog_read_col_val(&rctx, 2, &col_type);
+
+			// Set this current row as read
+			dblog_upd_col_val(&rctx, 1, (void *) &alreadyReadStatus);
+
+			// Filling data
+			datagas.unixtime = *(time_t *) unixtimeColumn;
+			datagas.data = *(uint32_t *) dataColumn;
+
+			// Append it to the queue
+			datagasQueue.enqueue(datagas);
+		} while (!dblog_read_next_row(&rctx));
+
+		return;
+	}
+	else {
+		Serial.print("Error ");
+		Serial.print(res);
+		Serial.print(" reading datalog.\n");
+	}
 }
