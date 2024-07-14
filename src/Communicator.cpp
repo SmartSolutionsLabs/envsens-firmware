@@ -31,3 +31,19 @@ void Communicator::run(void * data) {
 		this->sendOut();
 	}
 }
+
+void Communicator::setEndpointHostname(String hostname) {
+	this->endpoint.hostname = hostname;
+}
+
+String Communicator::getEndpointHostname() const {
+	return this->endpoint.hostname;
+}
+
+void Communicator::setEndpointPost(String post) {
+	this->endpoint.post = post;
+}
+
+String Communicator::getEndpointPost() const {
+	return this->endpoint.post;
+}

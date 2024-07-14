@@ -19,6 +19,14 @@ class Communicator : public Thread {
 	private:
 		HttpClient * httpClient;
 
+		/**
+		 * Where is the endpoint.
+		 */
+		struct {
+			String hostname;
+			String post;
+		} endpoint;
+
 	public:
 		// For singleton
 		static Communicator * getInstance();
@@ -39,6 +47,11 @@ class Communicator : public Thread {
 		 * Checks if there are new logged data to send them out.
 		 */
 		void run(void * data) override;
+
+		void setEndpointHostname(String hostname);
+		String getEndpointHostname() const;
+		void setEndpointPost(String post);
+		String getEndpointPost() const;
 };
 
 #endif
