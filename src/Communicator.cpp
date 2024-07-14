@@ -22,11 +22,27 @@ void Communicator::parseIncome(void * data) {
 }
 
 inline void Communicator::sendOut() {
+	static int err;
+	err = 0;
+
+	this->httpClient->post(this->endpoint.hostname.c_str(), this->endpoint.post.c_str());
+	if (err == 0) {
+		err = this->httpClient->responseStatusCode();
+
+		if (err == 200) {
+			Serial.print("Got OK status\n");
+		}
+	}
 }
 
 void Communicator::run(void * data) {
 	while (1) {
 		vTaskDelay(this->iterationDelay);
+
+		// If the endpoint is empty we can't send anything
+		if (this->endpoint.hostname.length() == 0) {
+			continue;
+		}
 
 		this->sendOut();
 	}
