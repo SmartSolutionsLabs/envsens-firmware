@@ -8,6 +8,7 @@
 #define SENSOR_CO2_INDEX 2
 
 #include <Arduino.h>
+#include <Preferences.h>
 
 #include "Sensor.hpp"
 
@@ -25,6 +26,11 @@ class Hensor {
 		bool oldBluetoothDeviceConnected = false;
 
 		Sensor * sensors[SENSORS_QUANTITY];
+
+		/**
+		 * Simple storage for data needed in runtime.
+		 */
+		Preferences preferences;
 
 	public:
 		static Hensor * getInstance();
@@ -49,6 +55,10 @@ class Hensor {
 		// About WiFi
 		void getWifiCredentials(String &ssid, String &password) const;
 		void setWifiCredentials(String &ssid, String &password);
+
+		// About HTTP endpoints
+		void setEndpointHostname(String hostname, bool persistent = true);
+		void setEndpointPost(String post, bool persistent = true);
 };
 
 #endif

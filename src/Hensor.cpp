@@ -1,4 +1,5 @@
 #include "Hensor.hpp"
+#include "Communicator.hpp"
 #include "Multisensor.hpp"
 #include "NH3sensor.hpp"
 #include "CO2sensor.hpp"
@@ -16,6 +17,11 @@ Hensor * Hensor::getInstance() {
 }
 
 Hensor::Hensor() {
+	// Section for loading parameters
+	this->preferences.begin("hensor", false); // Namespace for everything
+	this->setEndpointHostname(this->preferences.getString("hostname", ""), false);
+	this->setEndpointPost(this->preferences.getString("post", ""), false);
+
 	TwoWire twoWire = TwoWire(0);
 
 	this->sensors[SENSOR_MULTI_INDEX] = new Multisensor("multi");
@@ -57,4 +63,22 @@ void Hensor::setBluetoothDeviceConnected(bool connected) {
 
 void Hensor::setOldBluetoothDeviceConnected(bool connected) {
 	this->oldBluetoothDeviceConnected = connected;
+}
+
+void Hensor::setEndpointHostname(String hostname, bool persistent) {
+	if (persistent) {
+		this->preferences.putString("hostname", hostname);
+	}
+
+	// Pass it directly to the communicator
+	Communicator::getInstance()->setEndpointHostname(hostname);
+}
+
+void Hensor::setEndpointPost(String post, bool persistent) {
+	if (persistent) {
+		this->preferences.putString("post", post);
+	}
+
+	// Pass it directly to the communicator
+	Communicator::getInstance()->setEndpointPost(post);
 }
