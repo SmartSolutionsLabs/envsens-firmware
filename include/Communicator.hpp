@@ -23,8 +23,8 @@ class Communicator : public Thread {
 		 * Where is the endpoint.
 		 */
 		struct {
-			String hostname;
-			String post;
+			volatile String hostname;
+			volatile String post;
 		} endpoint;
 
 	public:
@@ -49,9 +49,9 @@ class Communicator : public Thread {
 		void run(void * data) override;
 
 		void setEndpointHostname(String hostname);
-		String getEndpointHostname() const;
+		inline const String& getEndpointHostname() const;
 		void setEndpointPost(String post);
-		String getEndpointPost() const;
+		inline const String& getEndpointPost() const;
 };
 
 #endif
