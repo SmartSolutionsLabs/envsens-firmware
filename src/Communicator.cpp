@@ -25,7 +25,10 @@ inline void Communicator::sendOut() {
 	static int err;
 	err = 0;
 
-	this->httpClient->post(this->endpoint.hostname.c_str(), this->endpoint.post.c_str());
+	const char * hostname = const_cast<const String&>(this->endpoint.hostname).c_str();
+	const char * post = const_cast<const String&>(this->endpoint.hostname).c_str();
+
+	this->httpClient->post(hostname, post);
 	if (err == 0) {
 		err = this->httpClient->responseStatusCode();
 
@@ -40,7 +43,8 @@ void Communicator::run(void * data) {
 		vTaskDelay(this->iterationDelay);
 
 		// If the endpoint is empty we can't send anything
-		if (this->endpoint.hostname.length() == 0) {
+		const String& hostname = const_cast<const String&>(this->endpoint.hostname);
+		if (hostname.length() == 0) {
 			continue;
 		}
 
@@ -48,18 +52,20 @@ void Communicator::run(void * data) {
 	}
 }
 
-void Communicator::setEndpointHostname(String hostname) {
-	this->endpoint.hostname = hostname;
+void Communicator::setEndpointHostname(String newHostname) {
+	String& hostname = const_cast<String&>(this->endpoint.hostname);
+	hostname = newHostname;
 }
 
-String Communicator::getEndpointHostname() const {
-	return this->endpoint.hostname;
+inline const String& Communicator::getEndpointHostname() const {
+	return const_cast<const String&>(this->endpoint.hostname);
 }
 
-void Communicator::setEndpointPost(String post) {
-	this->endpoint.post = post;
+void Communicator::setEndpointPost(String newPost) {
+	String& post = const_cast<String&>(this->endpoint.hostname);
+	post = newPost;
 }
 
-String Communicator::getEndpointPost() const {
-	return this->endpoint.post;
+inline const String& Communicator::getEndpointPost() const {
+	return const_cast<const String&>(this->endpoint.post);
 }
