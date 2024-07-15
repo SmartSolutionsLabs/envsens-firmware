@@ -3,6 +3,7 @@
 
 #include "Thread.hpp"
 
+#include "FS.h"
 #include <ArduinoQueue.h>
 
 #ifndef DATALOGGER_QUEUE_SIZE_ITEMS
@@ -54,6 +55,10 @@ class Datalogger : public Thread {
 
 	private:
 		inline void save();
+
+		const char * filename = "/sd/datagas.db";
+
+		FILE * databaseFile;
 };
 
 #endif

@@ -1,5 +1,6 @@
 #include "Datalogger.hpp"
 
+#include "SD.h"
 #include "ulog_sqlite.h"
 
 Datalogger * Datalogger::datalogger = nullptr;
@@ -13,6 +14,9 @@ Datalogger * Datalogger::getInstance() {
 }
 
 Datalogger::Datalogger(const char * name) : Thread(name), queue(DATALOGGER_QUEUE_SIZE_ITEMS) {
+	SD.begin();
+
+	this->databaseFile = fopen(this->filename, "r+b");
 }
 
 void Datalogger::run(void * data) {
