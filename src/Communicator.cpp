@@ -43,8 +43,7 @@ void Communicator::run(void * data) {
 		vTaskDelay(this->iterationDelay);
 
 		// If the endpoint is empty we can't send anything
-		const String& hostname = const_cast<const String&>(this->endpoint.hostname);
-		if (hostname.length() == 0) {
+		if (const_cast<const String&>(this->endpoint.hostname).isEmpty()) {
 			continue;
 		}
 
