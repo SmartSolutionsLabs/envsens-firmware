@@ -33,6 +33,7 @@ void Datalogger::run(void * data) {
 
 inline void Datalogger::save() {
 	struct dblog_write_context ctx;
+	ctx.flush_fn = callbackLoggerFlush;
 	int res = dblog_write_init(&ctx);
 
 	if (!res) {
@@ -102,4 +103,20 @@ void Datalogger::acquire(ArduinoQueue<Datagas> &datagasQueue) const {
 		Serial.print(res);
 		Serial.print(" reading datalog.\n");
 	}
+}
+
+int callbackLoggerFlush(struct dblog_write_context *ctx) {
+	return DBLOG_RES_OK;
+}
+
+int32_t callbackLoggerWrite(struct dblog_write_context *ctx, void *buf, uint32_t pos, size_t len) {
+	return DBLOG_RES_ERR;
+}
+
+int32_t callbackLoggerReadReadCtx(struct dblog_read_context *ctx, void *buf, uint32_t pos, size_t len) {
+	return DBLOG_RES_ERR;
+}
+
+int32_t callbackLoggerReadWriteCtx(struct dblog_write_context *ctx, void *buf, uint32_t pos, size_t len) {
+	return DBLOG_RES_ERR;
 }

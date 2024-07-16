@@ -53,6 +53,8 @@ class Datalogger : public Thread {
 		 */
 		void acquire(ArduinoQueue<Datagas> &datagasQueue) const;
 
+		FILE * getDatabaseFile() const;
+
 	private:
 		inline void save();
 
@@ -60,5 +62,11 @@ class Datalogger : public Thread {
 
 		FILE * databaseFile;
 };
+
+// Callback headers for Micro Logger API
+int callbackLoggerFlush(struct dblog_write_context *ctx);
+int32_t callbackLoggerWrite(struct dblog_write_context *ctx, void *buf, uint32_t pos, size_t len);
+int32_t callbackLoggerReadReadCtx(struct dblog_read_context *ctx, void *buf, uint32_t pos, size_t len);
+int32_t callbackLoggerReadWriteCtx(struct dblog_write_context *ctx, void *buf, uint32_t pos, size_t len);
 
 #endif
