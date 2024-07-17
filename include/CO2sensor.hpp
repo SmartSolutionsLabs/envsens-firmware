@@ -3,11 +3,11 @@
 
 #include "Sensor.hpp"
 
-#include <SensirionI2CScd4x.h>
+#include <SparkFun_SCD4x_Arduino_Library.h>
 
 class CO2sensor : public Sensor {
 	protected:
-		SensirionI2CScd4x * sensor = nullptr;
+		SCD4x * sensor = nullptr;
 
 	public:
 		CO2sensor(const char * name, int taskCore = 1);
