@@ -22,7 +22,8 @@ Hensor::Hensor() {
 	this->setEndpointHostname(this->preferences.getString("hostname", ""), false);
 	this->setEndpointPost(this->preferences.getString("post", ""), false);
 
-	Wire.begin(5, 4);
+	// Only change pins because already started in master mode
+	Wire.setPins(5, 4);
 
 	this->sensors[SENSOR_MULTI_INDEX] = new Multisensor("multi");
 	this->sensors[SENSOR_MULTI_INDEX]->connect(&Wire);
