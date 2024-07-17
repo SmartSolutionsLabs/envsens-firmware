@@ -31,4 +31,8 @@ void Thread::start() {
 }
 
 void Thread::stop() {
+	Serial.print(this->name);
+	Serial.print(" task stopped.\n");
+	// From within the task itself is null
+	vTaskDelete(NULL);
 }
