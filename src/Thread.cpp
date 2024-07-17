@@ -17,7 +17,8 @@ void Thread::start() {
 		return;
 	}
 
-	Serial.println("Starting some task...");
+	Serial.print("Starting a task... ");
+	Serial.println(this->name);
 	//Start Task with input parameter set to "this" class
 	xTaskCreatePinnedToCore(
 		&runTask,          //Function to implement the task
