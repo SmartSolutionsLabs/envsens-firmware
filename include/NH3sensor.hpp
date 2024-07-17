@@ -3,7 +3,12 @@
 
 #include "Sensor.hpp"
 
+#include <Adafruit_ADS1X15.h>
+
 class NH3sensor : public Sensor {
+	protected:
+		Adafruit_ADS1115 * sensor = nullptr;
+
 	public:
 		NH3sensor(const char * name, int taskCore = 1);
 
