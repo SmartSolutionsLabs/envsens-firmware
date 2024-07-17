@@ -1,5 +1,7 @@
 #include "NH3sensor.hpp"
 
+static const char * HENSOR_TAG = "Hensor";
+
 NH3sensor::NH3sensor(const char * name, int taskCore) : Sensor(name, taskCore) {
 }
 
@@ -23,8 +25,8 @@ void NH3sensor::run(void* data) {
 		channelData = this->sensor->readADC_SingleEnded(0);
 		voltage = this->sensor->computeVolts(channelData);
 
-		Serial.print("Voltage: ");
-		Serial.println(voltage);
+		ESP_LOGI(HENSOR_TAG, "Channel data: %d", channelData);
+		ESP_LOGI(HENSOR_TAG, "Voltage: %.2f", voltage);
 	}
 
 	this->stop();

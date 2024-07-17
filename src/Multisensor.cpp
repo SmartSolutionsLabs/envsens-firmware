@@ -1,5 +1,7 @@
 #include "Multisensor.hpp"
 
+static const char * HENSOR_TAG = "Hensor";
+
 Multisensor::Multisensor(const char * name, int taskCore) : Sensor(name, taskCore) {
 }
 
@@ -22,8 +24,7 @@ void Multisensor::run(void* data) {
 			continue;
 		}
 
-		Serial.print("Temperature: ");
-		Serial.println(this->sensor->temperature);
+		ESP_LOGI(HENSOR_TAG, "Temperature(C): %.2f", this->sensor->temperature);
 	}
 
 	this->stop();

@@ -1,5 +1,7 @@
 #include "CO2sensor.hpp"
 
+static const char * HENSOR_TAG = "Hensor";
+
 CO2sensor::CO2sensor(const char * name, int taskCore) : Sensor(name, taskCore) {
 }
 
@@ -14,7 +16,7 @@ void CO2sensor::run(void* data) {
 		this->stop();
 	}
 
-	this->iterationDelay = 6000 / portTICK_PERIOD_MS;
+	this->iterationDelay = 15000 / portTICK_PERIOD_MS;
 
 	while (1) {
 		vTaskDelay(this->iterationDelay);
@@ -24,11 +26,8 @@ void CO2sensor::run(void* data) {
 			continue;
 		}
 
-		Serial.print("CO2(ppm): ");
-		Serial.println(this->sensor->getCO2());
-
-		Serial.print("Temperature(C): ");
-		Serial.println(this->sensor->getTemperature(), 1);
+		ESP_LOGI(HENSOR_TAG, "Temperature(C): %.2f", this->sensor->getTemperature());
+		ESP_LOGI(HENSOR_TAG, "CO2(ppm): %d", this->sensor->getCO2());
 	}
 
 	this->stop();
