@@ -7,4 +7,7 @@ void NH3sensor::connect(void * data) {
 }
 
 void NH3sensor::run(void* data) {
+	while (1) {
+		vTaskDelay(this->iterationDelay);
+	}
 }
