@@ -10,6 +10,10 @@ void Multisensor::connect(void * data) {
 }
 
 void Multisensor::run(void* data) {
+	if( !this->connectedStatus ) {
+		this->stop();
+	}
+
 	while (1) {
 		vTaskDelay(this->iterationDelay);
 
@@ -21,4 +25,6 @@ void Multisensor::run(void* data) {
 		Serial.print("Temperature: ");
 		Serial.println(this->sensor->temperature);
 	}
+
+	this->stop();
 }
