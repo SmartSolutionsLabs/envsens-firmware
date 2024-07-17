@@ -4,42 +4,32 @@ CO2sensor::CO2sensor(const char * name, int taskCore) : Sensor(name, taskCore) {
 }
 
 void CO2sensor::connect(void * data) {
-	this->sensor = new SensirionI2CScd4x();
+	this->sensor = new SCD4x();
 
-	this->sensor->begin((TwoWire&)data);
+	this->connectedStatus = this->sensor->begin(static_cast<TwoWire*>(data));
 }
 
 void CO2sensor::run(void* data) {
-	uint16_t error;
-	uint16_t co2 = 0;
-	float temperature = 0.0f;
-	float humidity = 0.0f;
-	bool isDataReady = false;
+	if( !this->connectedStatus ) {
+		this->stop();
+	}
+
+	this->iterationDelay = 6000 / portTICK_PERIOD_MS;
 
 	while (1) {
 		vTaskDelay(this->iterationDelay);
 
-		error = this->sensor->getDataReadyFlag(isDataReady);
-
-		if (error) {
-			Serial.print("Error trying to getDataReadyFlag()\n");
-		}
-
-		if (!isDataReady) {
+		if (!this->sensor->readMeasurement()) {
+			Serial.print("Failed to perform reading\n");
 			continue;
 		}
 
-		error = this->sensor->readMeasurement(co2, temperature, humidity);
-		if (error) {
-			Serial.print("Error trying to readMeasurement()\n");
-		}
-		else if (co2 == 0) {
-			Serial.print("Invalid CO2 sample detected, skipping.\n");
-			continue;
-		}
-		else {
-			Serial.print("Co2:");
-			Serial.println(co2);
-		}
+		Serial.print("CO2(ppm): ");
+		Serial.println(this->sensor->getCO2());
+
+		Serial.print("Temperature(C): ");
+		Serial.println(this->sensor->getTemperature(), 1);
 	}
+
+	this->stop();
 }
