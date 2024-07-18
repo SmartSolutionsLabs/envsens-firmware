@@ -16,33 +16,67 @@ Datalogger * Datalogger::getInstance() {
 }
 
 Datalogger::Datalogger(const char * name) : Thread(name), queue(DATALOGGER_QUEUE_SIZE_ITEMS) {
-	if (!SD.begin()){
-		ESP_LOGW(HENSOR_TAG, "Card Mount Failed");
-		return;
-	}
-
-	uint8_t cardType = SD.cardType();
-
-	if (cardType == CARD_NONE) {
-		ESP_LOGW(HENSOR_TAG, "No SD card attached");
-		return;
-	}
-
-	uint64_t cardSize = SD.cardSize() / (1024 * 1024);
-	ESP_LOGI(HENSOR_TAG, "SD Card Size: %lluMB", cardSize);
-
-	this->databaseFile = fopen(this->filename, "r+b");
 }
 
 void Datalogger::run(void * data) {
 	while (1) {
 		vTaskDelay(this->iterationDelay);
 
+		if (!this->tryCard()) {
+			continue;
+		}
+
 		if (this->queue.isEmpty()) {
 			continue;
 		}
 
 		this->save();
+	}
+}
+
+inline bool Datalogger::tryCard() {
+	if (SD.exists("/datagas.db")) {
+		return true;
+	}
+	else {
+		if (!SD.begin()){
+			ESP_LOGW(HENSOR_TAG, "Card Mount Failed");
+			return false;
+		}
+
+		uint8_t cardType = SD.cardType();
+
+		if (cardType == CARD_NONE) {
+			ESP_LOGW(HENSOR_TAG, "No SD card attached");
+			return false;
+		}
+
+		if(cardType == CARD_MMC){
+			ESP_LOGI(HENSOR_TAG, "SD Card Type: MMC");
+		}
+		else if(cardType == CARD_SD) {
+			ESP_LOGI(HENSOR_TAG, "SD Card Type: SDSC");
+		}
+		else if(cardType == CARD_SDHC){
+			ESP_LOGI(HENSOR_TAG, "SD Card Type: SDHC");
+		}
+		else {
+			ESP_LOGI(HENSOR_TAG, "Unknown SD Card Type");
+		}
+
+		uint64_t cardSize = SD.cardSize() / (1024 * 1024);
+		ESP_LOGI(HENSOR_TAG, "SD Card Size: %lluMB", cardSize);
+
+		this->databaseFile = fopen(this->filename, "w+b");
+
+		if (this->databaseFile == nullptr) {
+			ESP_LOGE(HENSOR_TAG, "Failed to open database for writing");
+			return false;
+		}
+		else {
+			ESP_LOGI(HENSOR_TAG, "Opened file for writing");
+			return true;
+		}
 	}
 }
 

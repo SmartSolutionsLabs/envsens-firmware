@@ -55,6 +55,8 @@ class Datalogger : public Thread {
 
 		FILE * getDatabaseFile() const;
 
+		inline bool tryCard();
+
 	private:
 		inline void save();
 
