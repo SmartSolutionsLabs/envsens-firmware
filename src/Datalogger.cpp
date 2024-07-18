@@ -34,6 +34,10 @@ void Datalogger::run(void * data) {
 	}
 }
 
+FILE * Datalogger::getDatabaseFile() const {
+	return this->databaseFile;
+}
+
 inline bool Datalogger::tryCard() {
 	if (SD.exists("/datagas.db")) {
 		return true;
