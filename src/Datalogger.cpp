@@ -159,13 +159,52 @@ int callbackLoggerFlush(struct dblog_write_context *ctx) {
 }
 
 int32_t callbackLoggerWrite(struct dblog_write_context *ctx, void *buf, uint32_t pos, size_t len) {
-	return DBLOG_RES_ERR;
+	FILE * databaseFile = Datalogger::getInstance()->getDatabaseFile();
+
+	if (fseek(databaseFile, pos, SEEK_SET)) {
+		return DBLOG_RES_SEEK_ERR;
+	}
+
+	size_t ret = fwrite(buf, 1, len, databaseFile);
+	if (ret != len) {
+		return DBLOG_RES_ERR;
+	}
+
+	if (fflush(databaseFile)) {
+		return DBLOG_RES_FLUSH_ERR;
+	}
+
+	fsync(fileno(databaseFile));
+
+	return ret;
 }
 
 int32_t callbackLoggerReadReadCtx(struct dblog_read_context *ctx, void *buf, uint32_t pos, size_t len) {
-	return DBLOG_RES_ERR;
+	FILE * databaseFile = Datalogger::getInstance()->getDatabaseFile();
+
+	if (fseek(databaseFile, pos, SEEK_SET)) {
+		return DBLOG_RES_SEEK_ERR;
+	}
+
+	size_t ret = fread(buf, 1, len, databaseFile);
+	if (ret != len) {
+		return DBLOG_RES_READ_ERR;
+	}
+
+	return ret;
 }
 
 int32_t callbackLoggerReadWriteCtx(struct dblog_write_context *ctx, void *buf, uint32_t pos, size_t len) {
-	return DBLOG_RES_ERR;
+	FILE * databaseFile = Datalogger::getInstance()->getDatabaseFile();
+
+	if (fseek(databaseFile, pos, SEEK_SET)) {
+		return DBLOG_RES_SEEK_ERR;
+	}
+
+	size_t ret = fread(buf, 1, len, databaseFile);
+	if (ret != len) {
+		return DBLOG_RES_READ_ERR;
+	}
+
+	return ret;
 }
