@@ -85,8 +85,18 @@ inline bool Datalogger::tryCard() {
 }
 
 inline void Datalogger::save() {
+	#define BUF_SIZE 4096
+	byte buf[BUF_SIZE];
+
 	struct dblog_write_context ctx;
+	ctx.buf = buf;
+	ctx.col_count = 2;
+	ctx.page_resv_bytes = 0;
+	ctx.page_size_exp = 12;
+	ctx.max_pages_exp = 0;
+	ctx.read_fn = callbackLoggerReadWriteCtx;
 	ctx.flush_fn = callbackLoggerFlush;
+	ctx.write_fn = callbackLoggerWrite;
 	int res = dblog_write_init(&ctx);
 
 	if (!res) {
