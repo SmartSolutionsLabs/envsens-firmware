@@ -3,6 +3,8 @@
 #include "SD.h"
 #include "ulog_sqlite.h"
 
+static const char * HENSOR_TAG = "Hensor";
+
 Datalogger * Datalogger::datalogger = nullptr;
 
 Datalogger * Datalogger::getInstance() {
@@ -14,7 +16,20 @@ Datalogger * Datalogger::getInstance() {
 }
 
 Datalogger::Datalogger(const char * name) : Thread(name), queue(DATALOGGER_QUEUE_SIZE_ITEMS) {
-	SD.begin();
+	if (!SD.begin()){
+		ESP_LOGW(HENSOR_TAG, "Card Mount Failed");
+		return;
+	}
+
+	uint8_t cardType = SD.cardType();
+
+	if (cardType == CARD_NONE) {
+		ESP_LOGW(HENSOR_TAG, "No SD card attached");
+		return;
+	}
+
+	uint64_t cardSize = SD.cardSize() / (1024 * 1024);
+	ESP_LOGI(HENSOR_TAG, "SD Card Size: %lluMB", cardSize);
 
 	this->databaseFile = fopen(this->filename, "r+b");
 }
