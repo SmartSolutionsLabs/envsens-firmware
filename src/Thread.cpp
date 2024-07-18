@@ -1,5 +1,7 @@
 #include "Thread.hpp"
 
+static const char * HENSOR_TAG = "Hensor";
+
 Thread::Thread(const char * name, int taskCore) : name(name), taskCore(taskCore) {
 }
 
@@ -13,12 +15,10 @@ void Thread::runTask(void *_this) {
 
 void Thread::start() {
 	if(this->taskHandler != nullptr) {
-		Serial.println("Task::start - There might be a task already running!");
+		ESP_LOGE(HENSOR_TAG, "There might be a %s task already running!", this->name);
 		return;
 	}
 
-	Serial.print("Starting a task... ");
-	Serial.println(this->name);
 	//Start Task with input parameter set to "this" class
 	xTaskCreatePinnedToCore(
 		&runTask,          //Function to implement the task
@@ -31,8 +31,7 @@ void Thread::start() {
 }
 
 void Thread::stop() {
-	Serial.print(this->name);
-	Serial.print(" task stopped.\n");
+	ESP_LOGV(HENSOR_TAG, "Stopping %s task...", this->name);
 	// From within the task itself is null
 	vTaskDelete(NULL);
 }
