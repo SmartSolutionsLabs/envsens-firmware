@@ -2,6 +2,7 @@
 #define INC_COMMUNICATOR
 
 #include "Thread.hpp"
+#include "Ble.hpp"
 
 #include <HttpClient.h>
 #include <ArduinoQueue.h>

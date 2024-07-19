@@ -23,15 +23,22 @@ Communicator::Communicator(const char * name, int taskCore) : Thread(name, taskC
 
 void Communicator::parseIncome(void * data) {
 	String * message = static_cast<String*>(data);
+	JsonDocument jsonAnswer;
 	JsonDocument instruction;
 	deserializeJson(instruction, *message);
 
+	jsonAnswer["cmd"] = instruction["cmd"];
 	unsigned int cmd = instruction["cmd"];
 
 	switch(cmd) {
 		default:
 			ESP_LOGI(HENSOR_TAG, "Command non valid");
 	}
+
+	// Answer
+	std::string answer;
+	serializeJson(jsonAnswer, answer);
+	Ble::bleCallback->writeLargeText(Ble::resCharacteristic, answer);
 }
 
 inline void Communicator::sendOut() {
