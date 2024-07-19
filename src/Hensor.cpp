@@ -73,6 +73,8 @@ void Hensor::setWifiCredentials(String &ssid, String &password) {
 
 	Network::PASSWORD = password;
 	this->preferences.putString("netSsid", password);
+
+	Network::getInstance()->connect();
 }
 
 void Hensor::setEndpointHostname(String hostname, bool persistent) {
