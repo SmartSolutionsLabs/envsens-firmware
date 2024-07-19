@@ -10,6 +10,10 @@
 #define DATALOGGER_QUEUE_SIZE_ITEMS 128
 #endif
 
+#ifndef DATALOGGER_BUF_SIZE
+#define DATALOGGER_BUF_SIZE 4096
+#endif
+
 /**
  * Data of environment detected by any sensor.
  * Not only for gas.
