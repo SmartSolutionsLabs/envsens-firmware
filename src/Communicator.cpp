@@ -1,4 +1,5 @@
 #include "Communicator.hpp"
+#include "Hensor.hpp"
 
 #include <ArduinoJson.h>
 #include <WiFi.h>
@@ -22,6 +23,8 @@ Communicator::Communicator(const char * name, int taskCore) : Thread(name, taskC
 }
 
 void Communicator::parseIncome(void * data) {
+	static Hensor * hensor = Hensor::getInstance();
+
 	String * message = static_cast<String*>(data);
 	JsonDocument jsonAnswer;
 	JsonDocument instruction;
@@ -31,6 +34,12 @@ void Communicator::parseIncome(void * data) {
 	unsigned int cmd = instruction["cmd"];
 
 	switch(cmd) {
+		case 7: {
+			String ssid = instruction["ssid"];
+			String pass = instruction["pass"];
+
+			hensor->setWifiCredentials(ssid, pass);
+		}
 		default:
 			ESP_LOGI(HENSOR_TAG, "Command non valid");
 	}
