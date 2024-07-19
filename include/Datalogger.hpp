@@ -14,6 +14,8 @@
 #define DATALOGGER_BUF_SIZE 4096
 #endif
 
+void IRAM_ATTR interruptDataSaver(void* arg);
+
 /**
  * Data of environment detected by any sensor.
  * Not only for gas.
@@ -38,10 +40,14 @@ class Datalogger : public Thread {
 
 		ArduinoQueue<Datagas> queue;
 
+		volatile bool saving = false;
+
 	public:
 		static Datalogger * getInstance();
 		Datalogger(Datalogger &other) = delete;
 		void operator=(const Datalogger &) = delete;
+
+		esp_timer_handle_t saverTimer = nullptr;
 
 		void run(void* data) override;
 
@@ -64,6 +70,10 @@ class Datalogger : public Thread {
 		FILE * getDatabaseFile() const;
 
 		inline bool tryCard();
+
+		void setSaving(bool saving = true);
+
+		bool isSaving() const;
 
 	private:
 		inline void save();

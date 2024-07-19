@@ -3,7 +3,6 @@
 #include "Multisensor.hpp"
 #include "NH3sensor.hpp"
 #include "CO2sensor.hpp"
-#include "Datalogger.hpp"
 
 #include <Wire.h>
 
@@ -37,9 +36,6 @@ Hensor::Hensor() {
 	this->sensors[SENSOR_NH3_INDEX] = new NH3sensor("nh3");
 	this->sensors[SENSOR_NH3_INDEX]->connect(&Wire);
 	this->sensors[SENSOR_NH3_INDEX]->start();
-
-	// For initializing
-	Datalogger::getInstance()->start();
 }
 
 void Hensor::processMessage(String message) {

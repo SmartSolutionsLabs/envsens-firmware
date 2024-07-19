@@ -1,15 +1,25 @@
 #include "Ble.hpp"
 #include "Hensor.hpp"
+#include "Datalogger.hpp"
 
 Hensor * hensor;
+Datalogger * datalogger;
 
 TickType_t xDelay;
+
+// Controlling motor acceleration
+void IRAM_ATTR interruptDataSaver(void* arg) {
+	datalogger->setSaving();
+}
 
 void setup() {
 	Serial.begin(115200);
 	xDelay = 500 / portTICK_PERIOD_MS;
 
 	hensor = Hensor::getInstance();
+
+	datalogger = Datalogger::getInstance();
+	datalogger->start();
 
 	Ble * ble = new Ble(BLUETOOTH_DEVICE_NAME);
 }

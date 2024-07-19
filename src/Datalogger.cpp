@@ -16,6 +16,17 @@ Datalogger * Datalogger::getInstance() {
 }
 
 Datalogger::Datalogger(const char * name) : Thread(name), queue(DATALOGGER_QUEUE_SIZE_ITEMS) {
+	// Execute in interval of time
+	if(this->saverTimer == nullptr) {
+		const esp_timer_create_args_t periodic_timer_args = {
+				.callback = &interruptDataSaver,
+				.arg = NULL,
+				.dispatch_method = ESP_TIMER_TASK,
+				.name = "saver_timer"
+		};
+		esp_timer_create(&periodic_timer_args, &this->saverTimer);
+		esp_timer_start_periodic(this->saverTimer, 1000000 / 100); // Fraction of time
+	}
 }
 
 void Datalogger::run(void * data) {
@@ -189,6 +200,14 @@ void Datalogger::acquire(ArduinoQueue<Datagas> &datagasQueue) const {
 		Serial.print(res);
 		Serial.print(" reading datalog.\n");
 	}
+}
+
+void Datalogger::setSaving(bool saving) {
+	this->saving = saving;
+}
+
+bool Datalogger::isSaving() const {
+	return this->saving;
 }
 
 int callbackLoggerFlush(struct dblog_write_context *ctx) {
