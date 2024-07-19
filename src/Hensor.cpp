@@ -23,6 +23,10 @@ Hensor::Hensor() {
 	this->setEndpointHostname(this->preferences.getString("hostname", ""), false);
 	this->setEndpointPost(this->preferences.getString("post", ""), false);
 
+	Network::SSID = this->preferences.getString("netSsid", "");
+	Network::PASSWORD = this->preferences.getString("netPassword", "");
+	Network::getInstance()->connect();
+
 	// Only change pins because already started in master mode
 	Wire.setPins(5, 4);
 
@@ -72,7 +76,7 @@ void Hensor::setWifiCredentials(String &ssid, String &password) {
 	this->preferences.putString("netSsid", ssid);
 
 	Network::PASSWORD = password;
-	this->preferences.putString("netSsid", password);
+	this->preferences.putString("netPassword", password);
 
 	Network::getInstance()->connect();
 }
