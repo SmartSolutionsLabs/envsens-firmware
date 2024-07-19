@@ -54,7 +54,7 @@ class Datalogger : public Thread {
 		 * Appends a datagas created with passed parameters.
 		 * Unixtime is gotten inside.
 		 */
-		void append(uint32_t data);
+		void append(uint32_t co2, uint32_t nh3, uint32_t temperature, uint32_t humidity);
 
 		/**
 		 * Fill the queue that must be empty with records.
