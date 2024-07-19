@@ -3,6 +3,7 @@
 #include "Multisensor.hpp"
 #include "NH3sensor.hpp"
 #include "CO2sensor.hpp"
+#include "Network.hpp"
 
 #include <Wire.h>
 
@@ -64,6 +65,14 @@ void Hensor::setBluetoothDeviceConnected(bool connected) {
 
 void Hensor::setOldBluetoothDeviceConnected(bool connected) {
 	this->oldBluetoothDeviceConnected = connected;
+}
+
+void Hensor::setWifiCredentials(String &ssid, String &password) {
+	Network::SSID = ssid;
+	this->preferences.putString("netSsid", ssid);
+
+	Network::PASSWORD = password;
+	this->preferences.putString("netSsid", password);
 }
 
 void Hensor::setEndpointHostname(String hostname, bool persistent) {
