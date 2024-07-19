@@ -20,7 +20,11 @@
  */
 struct Datagas {
 	time_t unixtime;
-	uint32_t data;
+	uint32_t status; // As read or not
+	uint32_t co2;
+	uint32_t nh3;
+	uint32_t temperature;
+	uint32_t humidity;
 };
 
 /**
