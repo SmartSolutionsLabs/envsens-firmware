@@ -1,6 +1,9 @@
 #include "Communicator.hpp"
 
+#include <ArduinoJson.h>
 #include <WiFi.h>
+
+static const char * HENSOR_TAG = "Hensor";
 
 Communicator * Communicator::communicator = nullptr;
 
@@ -19,6 +22,16 @@ Communicator::Communicator(const char * name, int taskCore) : Thread(name, taskC
 }
 
 void Communicator::parseIncome(void * data) {
+	String * message = static_cast<String*>(data);
+	JsonDocument instruction;
+	deserializeJson(instruction, *message);
+
+	unsigned int cmd = instruction["cmd"];
+
+	switch(cmd) {
+		default:
+			ESP_LOGI(HENSOR_TAG, "Command non valid");
+	}
 }
 
 inline void Communicator::sendOut() {
@@ -38,9 +51,22 @@ inline void Communicator::sendOut() {
 	}
 }
 
+void Communicator::addInstruction(String instruction) {
+	this->instructionsQueue.enqueue(instruction);
+}
+
 void Communicator::run(void * data) {
+	static TickType_t delay = 1 / portTICK_PERIOD_MS;
+
 	while (1) {
 		vTaskDelay(this->iterationDelay);
+
+		// Process external instructions
+		while (!this->instructionsQueue.isEmpty()) {
+			vTaskDelay(delay);
+			String instruction = this->instructionsQueue.dequeue();
+			this->parseIncome(&instruction);
+		}
 
 		// If the endpoint is empty we can't send anything
 		if (const_cast<const String&>(this->endpoint.hostname).isEmpty()) {

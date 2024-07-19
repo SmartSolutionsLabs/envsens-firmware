@@ -4,6 +4,7 @@
 #include "Thread.hpp"
 
 #include <HttpClient.h>
+#include <ArduinoQueue.h>
 
 /**
  * Process every income and outcome.
@@ -15,6 +16,8 @@ class Communicator : public Thread {
 		Communicator();
 		Communicator(const char * name);
 		Communicator(const char * name, int taskCore);
+
+		ArduinoQueue<String> instructionsQueue;
 
 	private:
 		HttpClient * httpClient;
@@ -42,6 +45,11 @@ class Communicator : public Thread {
 		 * Sends data to exterior.
 		 */
 		inline void sendOut();
+
+		/**
+		 * Append an instruction to queue for processing in the thread.
+		 */
+		void addInstruction(String);
 
 		/**
 		 * Checks if there are new logged data to send them out.

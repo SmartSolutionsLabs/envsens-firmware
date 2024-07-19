@@ -39,7 +39,7 @@ Hensor::Hensor() {
 }
 
 void Hensor::processMessage(String message) {
-	Serial.println(message);
+	Communicator::getInstance()->addInstruction(message);
 }
 
 Sensor * Hensor::getSensor(unsigned int index) const {

@@ -1,6 +1,7 @@
 #include "Ble.hpp"
 #include "Hensor.hpp"
 #include "Datalogger.hpp"
+#include "Communicator.hpp"
 
 Hensor * hensor;
 Datalogger * datalogger;
@@ -20,6 +21,8 @@ void setup() {
 
 	datalogger = Datalogger::getInstance();
 	datalogger->start();
+
+	Communicator::getInstance()->start();
 
 	Ble * ble = new Ble(BLUETOOTH_DEVICE_NAME);
 }
