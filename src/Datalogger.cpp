@@ -19,12 +19,11 @@ Datalogger::Datalogger(const char * name) : Thread(name), queue(DATALOGGER_QUEUE
 }
 
 void Datalogger::run(void * data) {
+	// Opening for the first time
+	this->tryCard();
+
 	while (1) {
 		vTaskDelay(this->iterationDelay);
-
-		if (!this->tryCard()) {
-			continue;
-		}
 
 		if (this->queue.isEmpty()) {
 			continue;
@@ -85,12 +84,11 @@ inline bool Datalogger::tryCard() {
 }
 
 inline void Datalogger::save() {
-	#define BUF_SIZE 4096
-	byte buf[BUF_SIZE];
+	byte buf[DATALOGGER_BUF_SIZE];
 
 	struct dblog_write_context ctx;
 	ctx.buf = buf;
-	ctx.col_count = 2;
+	ctx.col_count = 6;
 	ctx.page_resv_bytes = 0;
 	ctx.page_size_exp = 12;
 	ctx.max_pages_exp = 0;
@@ -103,7 +101,12 @@ inline void Datalogger::save() {
 		while (!this->queue.isEmpty()) {
 			Datagas datagas = this->queue.dequeue();
 
-			res = dblog_set_col_val(&ctx, 0, DBLOG_TYPE_INT, &datagas.data, sizeof(uint32_t));
+			res = dblog_set_col_val(&ctx, 0, DBLOG_TYPE_INT, &datagas.unixtime, sizeof(uint32_t));
+			res = dblog_set_col_val(&ctx, 1, DBLOG_TYPE_INT, &datagas.status, sizeof(uint32_t));
+			res = dblog_set_col_val(&ctx, 2, DBLOG_TYPE_INT, &datagas.co2, sizeof(uint32_t));
+			res = dblog_set_col_val(&ctx, 3, DBLOG_TYPE_INT, &datagas.nh3, sizeof(uint32_t));
+			res = dblog_set_col_val(&ctx, 4, DBLOG_TYPE_INT, &datagas.temperature, sizeof(uint32_t));
+			res = dblog_set_col_val(&ctx, 5, DBLOG_TYPE_INT, &datagas.humidity, sizeof(uint32_t));
 
 			res = dblog_append_empty_row(&ctx);
 		}
@@ -119,16 +122,25 @@ void Datalogger::append(const Datagas &datagas) {
 	this->queue.enqueue(datagas);
 }
 
-void Datalogger::append(uint32_t data) {
+void Datalogger::append(uint32_t co2, uint32_t nh3, uint32_t temperature, uint32_t humidity) {
 	Datagas datagas;
 	datagas.unixtime = 0;
-	datagas.data = data;
+	datagas.status = 0;
+	datagas.co2 = co2;
+	datagas.nh3 = nh3;
+	datagas.temperature = temperature;
+	datagas.humidity = humidity;
 
 	this->queue.enqueue(datagas);
 }
 
 void Datalogger::acquire(ArduinoQueue<Datagas> &datagasQueue) const {
+	byte buf[DATALOGGER_BUF_SIZE];
+
 	struct dblog_read_context rctx;
+	rctx.page_size_exp = 9;
+	rctx.read_fn = callbackLoggerReadReadCtx;
+	rctx.buf = buf;
 	int res = dblog_read_init(&rctx);
 
 	static const int neverReadStatus = 0; // When never was read before
@@ -146,14 +158,25 @@ void Datalogger::acquire(ArduinoQueue<Datagas> &datagasQueue) const {
 			Datagas datagas;
 			uint32_t col_type;
 			const void * unixtimeColumn = (time_t *) dblog_read_col_val(&rctx, 0, &col_type);
-			const void * dataColumn = (uint32_t *) dblog_read_col_val(&rctx, 2, &col_type);
+			const void * statusColumn = (uint32_t *) dblog_read_col_val(&rctx, 1, &col_type);
+			const void * co2Column = (uint32_t *) dblog_read_col_val(&rctx, 2, &col_type);
+			const void * nh3Column = (uint32_t *) dblog_read_col_val(&rctx, 3, &col_type);
+			const void * temperatureColumn = (uint32_t *) dblog_read_col_val(&rctx, 4, &col_type);
+			const void * humidityColumn = (uint32_t *) dblog_read_col_val(&rctx, 5, &col_type);
 
 			// Set this current row as read
 			dblog_upd_col_val(&rctx, 1, (void *) &alreadyReadStatus);
 
 			// Filling data
 			datagas.unixtime = *(time_t *) unixtimeColumn;
-			datagas.data = *(uint32_t *) dataColumn;
+			datagas.status = *(uint32_t *) statusColumn;
+			datagas.co2 = *(uint32_t *) co2Column;
+			datagas.nh3 = *(uint32_t *) nh3Column;
+			datagas.temperature = *(uint32_t *) temperatureColumn;
+			datagas.humidity = *(uint32_t *) humidityColumn;
+
+			Serial.print("Unixtime: ");
+			Serial.print(datagas.unixtime);
 
 			// Append it to the queue
 			datagasQueue.enqueue(datagas);
