@@ -102,6 +102,7 @@ class Hensor {
 		bool isSendingOut() const;
 
 		void setTime(String dateTime);
+		DateTime getRtcNow();
 };
 
 #endif

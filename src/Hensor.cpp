@@ -169,3 +169,7 @@ void Hensor::setTime(String dateTime) {
 		));
 	}
 }
+
+DateTime Hensor::getRtcNow() {
+	return this->rtc.now();
+}

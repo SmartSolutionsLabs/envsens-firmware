@@ -78,7 +78,8 @@ inline void Communicator::sendOut() {
 	httpClient.setInsecure();
 
 	if (!httpClient.connect(this->endpoint.hostname.c_str(), 443)) {
-		Serial.print("Connection failed to endpoint\n");
+		Serial.print("Failed connection to ");
+		Serial.println(this->endpoint.hostname);
 		return;
 	}
 	else {
@@ -126,6 +127,8 @@ void Communicator::addInstruction(String instruction) {
 }
 
 void Communicator::run(void * data) {
+	static int checkedMinute = 0;
+	static int currentMinute;
 	static TickType_t delay = 1 / portTICK_PERIOD_MS;
 	static Hensor * hensor = Hensor::getInstance();
 
@@ -142,9 +145,16 @@ void Communicator::run(void * data) {
 		}
 
 		// If the endpoint is empty we can't send anything
-		if (hensor->isProductionMode() && hensor->isSendingOut() && this->endpoint.hostname.length() && WiFi.status() == WL_CONNECTED) {
-			hensor->setSendingOut(false);
-			this->sendOut();
+		if (hensor->isProductionMode() && !hensor->isSendingOut() && this->endpoint.hostname.length() && WiFi.status() == WL_CONNECTED) {
+			DateTime now = hensor->getRtcNow();
+			currentMinute = now.minute();
+
+			if (checkedMinute != currentMinute && currentMinute % 5 == 0) {
+				hensor->setSendingOut(true);
+				checkedMinute = currentMinute;
+				this->sendOut();
+				hensor->setSendingOut(false);
+			}
 		}
 	}
 }
