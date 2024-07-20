@@ -37,6 +37,11 @@ class Hensor {
 		 */
 		String deviceName;
 
+		/**
+		 * To decide turning WiFi for production or BLE to configuration.
+		 */
+		bool inProductionMode;
+
 	public:
 		static Hensor * getInstance();
 
@@ -66,6 +71,10 @@ class Hensor {
 		void setEndpointPost(String post, bool persistent = true);
 
 		void setDeviceName(String name, bool persistent = true);
+
+		// Control
+		void setProductionMode(bool mode = true);
+		bool isProductionMode() const;
 };
 
 #endif

@@ -23,10 +23,12 @@ Hensor::Hensor() {
 	this->setEndpointHostname(this->preferences.getString("hostname", ""), false);
 	this->setEndpointPost(this->preferences.getString("post", ""), false);
 	this->setDeviceName(this->preferences.getString("name", ""), false);
-
-	Network::SSID = this->preferences.getString("netSsid", "");
-	Network::PASSWORD = this->preferences.getString("netPassword", "");
-	Network::getInstance()->connect();
+	// To decide if we must turn on WiFi
+	if( this->inProductionMode = this->preferences.getBool("inProduction", false) ) {
+		Network::SSID = this->preferences.getString("netSsid", "");
+		Network::PASSWORD = this->preferences.getString("netPassword", "");
+		Network::getInstance()->connect();
+	}
 
 	// Only change pins because already started in master mode
 	Wire.setPins(5, 4);
@@ -106,4 +108,13 @@ void Hensor::setDeviceName(String name, bool persistent) {
 	}
 
 	this->deviceName = name;
+}
+
+void Hensor::setProductionMode(bool mode) {
+	this->inProductionMode = mode;
+	this->preferences.putBool("inProduction", mode);
+}
+
+bool Hensor::isProductionMode() const {
+	return this->inProductionMode;
 }
