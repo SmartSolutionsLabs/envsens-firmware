@@ -1,4 +1,5 @@
 #include "NH3sensor.hpp"
+#include "Hensor.hpp"
 
 static const char * HENSOR_TAG = "Hensor";
 
@@ -19,6 +20,8 @@ void NH3sensor::run(void* data) {
 	int16_t channelData = 0;
 	float voltage;
 
+	Hensor * hensor = Hensor::getInstance();
+
 	while (1) {
 		vTaskDelay(this->iterationDelay);
 
@@ -27,6 +30,8 @@ void NH3sensor::run(void* data) {
 
 		ESP_LOGI(HENSOR_TAG, "Channel data: %d", channelData);
 		ESP_LOGI(HENSOR_TAG, "Voltage: %.2f", voltage);
+
+		hensor->holdNH3Value(voltage);
 	}
 
 	this->stop();

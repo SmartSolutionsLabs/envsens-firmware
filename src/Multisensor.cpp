@@ -1,4 +1,5 @@
 #include "Multisensor.hpp"
+#include "Hensor.hpp"
 
 static const char * HENSOR_TAG = "Hensor";
 
@@ -16,6 +17,8 @@ void Multisensor::run(void* data) {
 		this->stop();
 	}
 
+	Hensor * hensor = Hensor::getInstance();
+
 	while (1) {
 		vTaskDelay(this->iterationDelay);
 
@@ -25,6 +28,10 @@ void Multisensor::run(void* data) {
 		}
 
 		ESP_LOGI(HENSOR_TAG, "Temperature(C): %.2f", this->sensor->temperature);
+
+		hensor->holdTemperatureValue(this->sensor->temperature);
+		hensor->holdHumidityValue(this->sensor->humidity);
+		hensor->holdPressureValue(this->sensor->pressure);
 	}
 
 	this->stop();
