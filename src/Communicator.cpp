@@ -26,24 +26,24 @@ void Communicator::parseIncome(void * data) {
 	static Hensor * hensor = Hensor::getInstance();
 
 	String * message = static_cast<String*>(data);
-	JsonDocument jsonAnswer;
-	JsonDocument instruction;
-	deserializeJson(instruction, *message);
+	JsonDocument jsonRequest;
+	JsonDocument jsonResponse;
+	deserializeJson(jsonRequest, *message);
 
-	jsonAnswer["cmd"] = instruction["cmd"];
-	unsigned int cmd = instruction["cmd"];
+	jsonResponse["cmd"] = jsonRequest["cmd"];
+	unsigned int cmd = jsonRequest["cmd"];
 
 	switch(cmd) {
 		case 7: {
-			String ssid = instruction["ssid"];
-			String pass = instruction["pass"];
+			String ssid = jsonRequest["ssid"];
+			String pass = jsonRequest["pass"];
 
 			hensor->setWifiCredentials(ssid, pass);
 
 			break;
 		}
 		case 1000: {
-			String name = instruction["name"];
+			String name = jsonRequest["name"];
 
 			hensor->setDeviceName(name);
 
@@ -55,7 +55,7 @@ void Communicator::parseIncome(void * data) {
 
 	// Answer
 	std::string answer;
-	serializeJson(jsonAnswer, answer);
+	serializeJson(jsonResponse, answer);
 	Ble::bleCallback->writeLargeText(Ble::resCharacteristic, answer);
 }
 
