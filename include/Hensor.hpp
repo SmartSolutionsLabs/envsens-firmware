@@ -77,7 +77,7 @@ class Hensor {
 		void setEndpointPost(String post, bool persistent = true);
 
 		void setDeviceName(String name, bool persistent = true);
-		void getDeviceName(String &name) const;
+		String getDeviceName() const;
 
 		// Control
 		void setProductionMode(bool mode = true);

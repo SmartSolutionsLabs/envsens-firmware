@@ -110,8 +110,8 @@ void Hensor::setDeviceName(String name, bool persistent) {
 	this->deviceName = name;
 }
 
-void Hensor::getDeviceName(String &name) const {
-	name = this->deviceName;
+String Hensor::getDeviceName() const {
+	return this->deviceName;
 }
 
 void Hensor::setProductionMode(bool mode) {

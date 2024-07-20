@@ -75,11 +75,27 @@ inline void Communicator::sendOut() {
 		return;
 	}
 	else {
+		Datagas currentDatagas = Hensor::getInstance()->getCurrentDatagas();
+		JsonDocument jsonResponse;
+		jsonResponse["Equipo"] = Hensor::getInstance()->getDeviceName();
+		jsonResponse["FechaHora"] = currentDatagas.unixtime;
+		jsonResponse["CO2"] = currentDatagas.co2;
+		jsonResponse["NH3"] = currentDatagas.nh3;
+		jsonResponse["Temp"] = currentDatagas.temperature;
+		jsonResponse["HR"] = currentDatagas.humidity;
+		jsonResponse["PR"] = currentDatagas.pressure;
+		String body;
+		serializeJson(jsonResponse, body);
+
 		// Make a HTTP request:
 		httpClient.println(String("POST ") + this->endpoint.post.c_str() + " HTTP/1.1");
 		httpClient.println(String("Host: ") + this->endpoint.hostname.c_str());
 		httpClient.println("Connection: close");
+		httpClient.println("Content-Type: application/json");
+		httpClient.print("Content-Length: ");
+		httpClient.println(body.length());
 		httpClient.println();
+		httpClient.println(body);
 
 		while (httpClient.connected()) {
 			String line = httpClient.readStringUntil('\n');
@@ -103,7 +119,7 @@ void Communicator::addInstruction(String instruction) {
 }
 
 void Communicator::run(void * data) {
-	static TickType_t delay = 1 / portTICK_PERIOD_MS;
+	static TickType_t delay = 3000 / portTICK_PERIOD_MS;
 	static Hensor * hensor = Hensor::getInstance();
 
 	while (1) {
