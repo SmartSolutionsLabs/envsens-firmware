@@ -163,6 +163,7 @@ Datagas Hensor::getCurrentDatagas() {
 }
 
 void Hensor::setSendingOut(bool sending) {
+	digitalWrite(CONFIG_STATUS_LED_PIN, sending ? HIGH : LOW);
 	this->sendingOut = sending;
 }
 
