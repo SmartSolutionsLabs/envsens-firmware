@@ -55,11 +55,13 @@ void Network::onConnected(WiFiEvent_t event, WiFiEventInfo_t info) {
 }
 
 void Network::onAddressed(WiFiEvent_t event, WiFiEventInfo_t info) {
+	digitalWrite(NETWORK_STATUS_LED_PIN, HIGH);
 	Serial.print("WiFi.addressed: ");
 	Serial.println(WiFi.localIP());
 }
 
 void Network::onDisconnected(WiFiEvent_t event, WiFiEventInfo_t info) {
+	digitalWrite(NETWORK_STATUS_LED_PIN, LOW);
 	Serial.print("WiFi.disconnected\n");
 
 	if(Network::SSID == "" || Network::PASSWORD == "") {

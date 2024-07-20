@@ -2,14 +2,19 @@
 #include "Hensor.hpp"
 #include "Communicator.hpp"
 
-#define BOOT_PIN 0
-
 Hensor * hensor;
 
 TickType_t xDelay;
 
 void setup() {
 	pinMode(BOOT_PIN, INPUT); // Button to change mode BLE/WiFi
+
+	pinMode(CONFIG_STATUS_LED_PIN, OUTPUT);
+	pinMode(CONFIG_STATUS_LED_GROUND_PIN, OUTPUT);
+	pinMode(NETWORK_STATUS_LED_PIN, OUTPUT);
+	pinMode(NETWORK_STATUS_LED_GROUND_PIN, OUTPUT);
+	digitalWrite(CONFIG_STATUS_LED_GROUND_PIN, LOW);
+	digitalWrite(NETWORK_STATUS_LED_GROUND_PIN, LOW);
 
 	Serial.begin(115200);
 	xDelay = 500 / portTICK_PERIOD_MS;
@@ -26,6 +31,19 @@ void setup() {
 	if ( !hensor->isProductionMode() ) {
 		// We turn on safetly
 		Ble * ble = new Ble(BLUETOOTH_DEVICE_NAME);
+
+		digitalWrite(CONFIG_STATUS_LED_PIN, HIGH);
+
+		digitalWrite(NETWORK_STATUS_LED_PIN, LOW); // By the way
+	}
+	else {
+		digitalWrite(CONFIG_STATUS_LED_PIN, LOW); // By the way
+
+		// Blinking for calling attention. End with led off.
+		for (unsigned int i = 5; i > 0; --i) {
+			digitalWrite(NETWORK_STATUS_LED_PIN, i & 1 ? LOW : HIGH);
+			vTaskDelay(xDelay);
+		}
 	}
 }
 
