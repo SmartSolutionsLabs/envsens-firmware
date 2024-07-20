@@ -3,6 +3,7 @@
 
 #include <ArduinoJson.h>
 #include <WiFi.h>
+#include <WiFiClientSecure.h>
 
 static const char * HENSOR_TAG = "Hensor";
 
@@ -17,9 +18,6 @@ Communicator * Communicator::getInstance() {
 }
 
 Communicator::Communicator(const char * name, int taskCore) : Thread(name, taskCore) {
-	WiFiClient wifiClient;
-
-	this->httpClient = new HttpClient(wifiClient);
 }
 
 void Communicator::parseIncome(void * data) {
@@ -69,19 +67,34 @@ void Communicator::parseIncome(void * data) {
 }
 
 inline void Communicator::sendOut() {
-	static int err;
-	err = 0;
+	WiFiClientSecure httpClient;
+	httpClient.setInsecure();
 
-	const char * hostname = this->endpoint.hostname.c_str();
-	const char * post = this->endpoint.hostname.c_str();
+	if (!httpClient.connect(this->endpoint.hostname.c_str(), 443)) {
+		Serial.print("Connection failed to endpoint\n");
+		return;
+	}
+	else {
+		// Make a HTTP request:
+		httpClient.println(String("POST ") + this->endpoint.post.c_str() + " HTTP/1.1");
+		httpClient.println(String("Host: ") + this->endpoint.hostname.c_str());
+		httpClient.println("Connection: close");
+		httpClient.println();
 
-	this->httpClient->post(hostname, post);
-	if (err == 0) {
-		err = this->httpClient->responseStatusCode();
-
-		if (err == 200) {
-			Serial.print("Got OK status\n");
+		while (httpClient.connected()) {
+			String line = httpClient.readStringUntil('\n');
+			if (line == "\r") {
+				break;
+			}
 		}
+		// if there are incoming bytes available
+		// from the server, read them and print them:
+		while (httpClient.available()) {
+			char c = httpClient.read();
+			Serial.write(c);
+		}
+
+		httpClient.stop();
 	}
 }
 
@@ -119,7 +132,7 @@ inline const String& Communicator::getEndpointHostname() const {
 }
 
 void Communicator::setEndpointPost(String newPost) {
-	this->endpoint.hostname = newPost;
+	this->endpoint.post = newPost;
 }
 
 inline const String& Communicator::getEndpointPost() const {

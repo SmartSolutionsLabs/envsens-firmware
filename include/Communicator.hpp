@@ -4,7 +4,6 @@
 #include "Thread.hpp"
 #include "Ble.hpp"
 
-#include <HttpClient.h>
 #include <ArduinoQueue.h>
 
 /**
@@ -21,8 +20,6 @@ class Communicator : public Thread {
 		ArduinoQueue<String> instructionsQueue;
 
 	private:
-		HttpClient * httpClient;
-
 		/**
 		 * Where is the endpoint.
 		 */
