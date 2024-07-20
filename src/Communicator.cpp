@@ -70,6 +70,18 @@ void Communicator::parseIncome(void * data) {
 
 			break;
 		}
+		case 2000: {
+			String wifiSsid, wifiPass;
+			hensor->getWifiCredentials(wifiSsid, wifiPass);
+			jsonResponse["name"] = hensor->getDeviceName();
+			jsonResponse["interval"] = this->networkInterval;
+			jsonResponse["wifi"]["ssid"] = wifiSsid;
+			jsonResponse["wifi"]["pass"] = wifiPass;
+			jsonResponse["endpoint"]["host"] = this->endpoint.hostname;
+			jsonResponse["endpoint"]["post"] = this->endpoint.post;
+
+			break;
+		}
 		default:
 			ESP_LOGI(HENSOR_TAG, "Command non valid");
 	}

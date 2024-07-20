@@ -24,10 +24,10 @@ Hensor::Hensor() {
 	this->setEndpointPost(this->preferences.getString("post", ""), false);
 	this->setDeviceName(this->preferences.getString("name", ""), false);
 	this->setNetworkInterval(this->preferences.getUInt("interval", 5), false);
+	Network::SSID = this->preferences.getString("netSsid", "");
+	Network::PASSWORD = this->preferences.getString("netPassword", "");
 	// To decide if we must turn on WiFi
 	if( this->inProductionMode = this->preferences.getBool("inProduction", false) ) {
-		Network::SSID = this->preferences.getString("netSsid", "");
-		Network::PASSWORD = this->preferences.getString("netPassword", "");
 		Network::getInstance()->connect();
 	}
 
@@ -75,6 +75,11 @@ void Hensor::setBluetoothDeviceConnected(bool connected) {
 
 void Hensor::setOldBluetoothDeviceConnected(bool connected) {
 	this->oldBluetoothDeviceConnected = connected;
+}
+
+void Hensor::getWifiCredentials(String &ssid, String &password) const {
+	ssid = Network::SSID;
+	password = Network::PASSWORD;
 }
 
 void Hensor::setWifiCredentials(String &ssid, String &password) {
