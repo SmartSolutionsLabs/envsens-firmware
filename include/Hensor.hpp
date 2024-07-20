@@ -32,6 +32,11 @@ class Hensor {
 		 */
 		Preferences preferences;
 
+		/**
+		 * Name of device for identify it
+		 */
+		String deviceName;
+
 	public:
 		static Hensor * getInstance();
 
@@ -59,6 +64,8 @@ class Hensor {
 		// About HTTP endpoints
 		void setEndpointHostname(String hostname, bool persistent = true);
 		void setEndpointPost(String post, bool persistent = true);
+
+		void setDeviceName(String name, bool persistent = true);
 };
 
 #endif

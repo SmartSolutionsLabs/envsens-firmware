@@ -22,6 +22,7 @@ Hensor::Hensor() {
 	this->preferences.begin("hensor", false); // Namespace for everything
 	this->setEndpointHostname(this->preferences.getString("hostname", ""), false);
 	this->setEndpointPost(this->preferences.getString("post", ""), false);
+	this->setDeviceName(this->preferences.getString("name", ""), false);
 
 	Network::SSID = this->preferences.getString("netSsid", "");
 	Network::PASSWORD = this->preferences.getString("netPassword", "");
@@ -97,4 +98,12 @@ void Hensor::setEndpointPost(String post, bool persistent) {
 
 	// Pass it directly to the communicator
 	Communicator::getInstance()->setEndpointPost(post);
+}
+
+void Hensor::setDeviceName(String name, bool persistent) {
+	if (persistent) {
+		this->preferences.putString("name", name);
+	}
+
+	this->deviceName = name;
 }
