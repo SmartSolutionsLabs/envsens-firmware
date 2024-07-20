@@ -49,6 +49,15 @@ void Communicator::parseIncome(void * data) {
 
 			break;
 		}
+		case 1001: {
+			String hostname = jsonRequest["host"];
+			String post = jsonRequest["post"];
+
+			hensor->setEndpointHostname(hostname);
+			hensor->setEndpointPost(post);
+
+			break;
+		}
 		default:
 			ESP_LOGI(HENSOR_TAG, "Command non valid");
 	}
