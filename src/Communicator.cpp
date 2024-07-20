@@ -39,6 +39,15 @@ void Communicator::parseIncome(void * data) {
 			String pass = instruction["pass"];
 
 			hensor->setWifiCredentials(ssid, pass);
+
+			break;
+		}
+		case 1000: {
+			String name = instruction["name"];
+
+			hensor->setDeviceName(name);
+
+			break;
 		}
 		default:
 			ESP_LOGI(HENSOR_TAG, "Command non valid");
