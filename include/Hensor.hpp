@@ -9,6 +9,7 @@
 
 #include <Arduino.h>
 #include <Preferences.h>
+#include <RTClib.h>
 
 #include "Sensor.hpp"
 #include "Datalogger.hpp"
@@ -49,6 +50,10 @@ class Hensor {
 		Datagas currentDatagas;
 
 		volatile bool sendingOut = false;
+
+		RTC_DS3231 rtc;
+
+		bool rtcAvailable = true;
 
 	public:
 		static Hensor * getInstance();
@@ -95,6 +100,8 @@ class Hensor {
 
 		void setSendingOut(bool sending = true);
 		bool isSendingOut() const;
+
+		void setTime(String dateTime);
 };
 
 #endif

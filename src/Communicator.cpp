@@ -40,6 +40,13 @@ void Communicator::parseIncome(void * data) {
 
 			break;
 		}
+		case 9: {
+			String dateTime(jsonRequest["time"].as<String>());
+
+			hensor->setTime(dateTime);
+
+			break;
+		}
 		case 1000: {
 			String name = jsonRequest["name"];
 

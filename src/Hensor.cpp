@@ -41,6 +41,11 @@ Hensor::Hensor() {
 
 	this->sensors[SENSOR_NH3_INDEX] = new NH3sensor("nh3");
 	this->sensors[SENSOR_NH3_INDEX]->connect(&Wire);
+
+	if (! this->rtc.begin()) {
+		Serial.println("Couldn't find RTC");
+		this->rtcAvailable = false;
+	}
 }
 
 void Hensor::processMessage(String message) {
@@ -150,4 +155,17 @@ void Hensor::setSendingOut(bool sending) {
 
 bool Hensor::isSendingOut() const {
 	return this->sendingOut;
+}
+
+void Hensor::setTime(String dateTime) {
+	if (this->rtcAvailable) {
+		this->rtc.adjust(DateTime(
+			dateTime.substring(0,   4).toInt(),
+			dateTime.substring(4,   6).toInt(),
+			dateTime.substring(6,   8).toInt(),
+			dateTime.substring(8,  10).toInt(),
+			dateTime.substring(10, 12).toInt(),
+			dateTime.substring(12, 14).toInt()
+		));
+	}
 }
