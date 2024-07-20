@@ -119,8 +119,10 @@ void Communicator::addInstruction(String instruction) {
 }
 
 void Communicator::run(void * data) {
-	static TickType_t delay = 3000 / portTICK_PERIOD_MS;
+	static TickType_t delay = 1 / portTICK_PERIOD_MS;
 	static Hensor * hensor = Hensor::getInstance();
+
+	this->iterationDelay = 6000 / portTICK_PERIOD_MS;
 
 	while (1) {
 		vTaskDelay(this->iterationDelay);
