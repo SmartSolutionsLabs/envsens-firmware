@@ -73,8 +73,10 @@ void Communicator::parseIncome(void * data) {
 		case 2000: {
 			String wifiSsid, wifiPass;
 			hensor->getWifiCredentials(wifiSsid, wifiPass);
+			DateTime now = hensor->getRtcNow();
 			jsonResponse["name"] = hensor->getDeviceName();
 			jsonResponse["interval"] = this->networkInterval;
+			jsonResponse["time"] = now.timestamp(DateTime::TIMESTAMP_FULL);
 			jsonResponse["wifi"]["ssid"] = wifiSsid;
 			jsonResponse["wifi"]["pass"] = wifiPass;
 			jsonResponse["endpoint"]["host"] = this->endpoint.hostname;
