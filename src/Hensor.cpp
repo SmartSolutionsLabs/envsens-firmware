@@ -23,6 +23,7 @@ Hensor::Hensor() {
 	this->setEndpointHostname(this->preferences.getString("hostname", ""), false);
 	this->setEndpointPost(this->preferences.getString("post", ""), false);
 	this->setDeviceName(this->preferences.getString("name", ""), false);
+	this->setNetworkInterval(this->preferences.getUInt("interval", 5), false);
 	// To decide if we must turn on WiFi
 	if( this->inProductionMode = this->preferences.getBool("inProduction", false) ) {
 		Network::SSID = this->preferences.getString("netSsid", "");
@@ -114,6 +115,14 @@ void Hensor::setDeviceName(String name, bool persistent) {
 
 String Hensor::getDeviceName() const {
 	return this->deviceName;
+}
+
+void Hensor::setNetworkInterval(uint32_t minutes, bool persistent) {
+	if (persistent) {
+		this->preferences.putUInt("interval", minutes);
+	}
+
+	Communicator::getInstance()->setNetworkInterval(minutes);
 }
 
 void Hensor::setProductionMode(bool mode) {

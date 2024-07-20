@@ -63,6 +63,13 @@ void Communicator::parseIncome(void * data) {
 
 			break;
 		}
+		case 1002: {
+			uint32_t interval = jsonRequest["lap"];
+
+			hensor->setNetworkInterval(interval);
+
+			break;
+		}
 		default:
 			ESP_LOGI(HENSOR_TAG, "Command non valid");
 	}
@@ -149,7 +156,7 @@ void Communicator::run(void * data) {
 			DateTime now = hensor->getRtcNow();
 			currentMinute = now.minute();
 
-			if (checkedMinute != currentMinute && currentMinute % 5 == 0) {
+			if (checkedMinute != currentMinute && currentMinute % this->networkInterval == 0) {
 				hensor->setSendingOut(true);
 				checkedMinute = currentMinute;
 				this->sendOut();
@@ -173,4 +180,8 @@ void Communicator::setEndpointPost(String newPost) {
 
 inline const String& Communicator::getEndpointPost() const {
 	return this->endpoint.post;
+}
+
+void Communicator::setNetworkInterval(uint32_t minutes) {
+	this->networkInterval = minutes;
 }

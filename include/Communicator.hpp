@@ -28,6 +28,11 @@ class Communicator : public Thread {
 			String post;
 		} endpoint;
 
+		/**
+		 * Lap to send data out.
+		 */
+		uint32_t networkInterval;
+
 	public:
 		// For singleton
 		static Communicator * getInstance();
@@ -58,6 +63,8 @@ class Communicator : public Thread {
 		inline const String& getEndpointHostname() const;
 		void setEndpointPost(String post);
 		inline const String& getEndpointPost() const;
+
+		void setNetworkInterval(uint32_t minutes);
 };
 
 #endif

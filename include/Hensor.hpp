@@ -83,8 +83,10 @@ class Hensor {
 		void setEndpointHostname(String hostname, bool persistent = true);
 		void setEndpointPost(String post, bool persistent = true);
 
+		// Initial parameters in boot
 		void setDeviceName(String name, bool persistent = true);
 		String getDeviceName() const;
+		void setNetworkInterval(uint32_t minutes, bool persistent = true);
 
 		// Control
 		void setProductionMode(bool mode = true);
