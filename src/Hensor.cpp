@@ -110,6 +110,10 @@ void Hensor::setDeviceName(String name, bool persistent) {
 	this->deviceName = name;
 }
 
+void Hensor::getDeviceName(String &name) const {
+	name = this->deviceName;
+}
+
 void Hensor::setProductionMode(bool mode) {
 	this->inProductionMode = mode;
 	this->preferences.putBool("inProduction", mode);
