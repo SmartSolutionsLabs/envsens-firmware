@@ -157,7 +157,8 @@ void Hensor::holdPressureValue(uint32_t value) {
 	this->currentDatagas.pressure = value;
 }
 
-Datagas Hensor::getCurrentDatagas() const {
+Datagas Hensor::getCurrentDatagas() {
+	this->currentDatagas.unixtime = this->rtc.now().unixtime();
 	return this->currentDatagas;
 }
 

@@ -98,7 +98,7 @@ class Hensor {
 		void holdHumidityValue(uint32_t value);
 		void holdPressureValue(uint32_t value);
 
-		Datagas getCurrentDatagas() const;
+		Datagas getCurrentDatagas();
 
 		void setSendingOut(bool sending = true);
 		bool isSendingOut() const;
