@@ -24,8 +24,8 @@ struct Datagas {
 	time_t unixtime = 0;
 	uint32_t status = 0; // As read or not
 	uint32_t co2 = 0;
-	uint32_t nh3 = 0;
-	uint32_t temperature = 0;
+	float_t nh3 = 0.0f;
+	float_t temperature = 0.0f;
 	uint32_t humidity = 0;
 	uint32_t pressure = 0;
 };
@@ -61,7 +61,7 @@ class Datalogger : public Thread {
 		 * Appends a datagas created with passed parameters.
 		 * Unixtime is gotten inside.
 		 */
-		void append(uint32_t co2, uint32_t nh3, uint32_t temperature, uint32_t humidity, uint32_t pressure);
+		void append(uint32_t co2, float_t nh3, float_t temperature, uint32_t humidity, uint32_t pressure);
 
 		/**
 		 * Fill the queue that must be empty with records.

@@ -141,11 +141,11 @@ void Hensor::holdCO2Value(uint32_t value) {
 	this->currentDatagas.co2 = value;
 }
 
-void Hensor::holdNH3Value(uint32_t value) {
+void Hensor::holdNH3Value(float_t value) {
 	this->currentDatagas.nh3 = value;
 }
 
-void Hensor::holdTemperatureValue(uint32_t value) {
+void Hensor::holdTemperatureValue(float_t value) {
 	this->currentDatagas.temperature = value;
 }
 

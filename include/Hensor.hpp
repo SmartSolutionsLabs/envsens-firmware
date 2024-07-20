@@ -93,8 +93,8 @@ class Hensor {
 		bool isProductionMode() const;
 
 		void holdCO2Value(uint32_t value);
-		void holdNH3Value(uint32_t value);
-		void holdTemperatureValue(uint32_t value);
+		void holdNH3Value(float_t value);
+		void holdTemperatureValue(float_t value);
 		void holdHumidityValue(uint32_t value);
 		void holdPressureValue(uint32_t value);
 
