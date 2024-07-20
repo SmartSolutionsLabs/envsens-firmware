@@ -48,6 +48,8 @@ class Hensor {
 		 */
 		Datagas currentDatagas;
 
+		volatile bool sendingOut = false;
+
 	public:
 		static Hensor * getInstance();
 
@@ -90,6 +92,9 @@ class Hensor {
 		void holdPressureValue(uint32_t value);
 
 		Datagas getCurrentDatagas() const;
+
+		void setSendingOut(bool sending = true);
+		bool isSendingOut() const;
 };
 
 #endif

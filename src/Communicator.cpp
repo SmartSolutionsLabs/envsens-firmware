@@ -122,7 +122,7 @@ void Communicator::run(void * data) {
 	static TickType_t delay = 1 / portTICK_PERIOD_MS;
 	static Hensor * hensor = Hensor::getInstance();
 
-	this->iterationDelay = 6000 / portTICK_PERIOD_MS;
+	this->iterationDelay = 10 / portTICK_PERIOD_MS;
 
 	while (1) {
 		vTaskDelay(this->iterationDelay);
@@ -135,7 +135,8 @@ void Communicator::run(void * data) {
 		}
 
 		// If the endpoint is empty we can't send anything
-		if (hensor->isProductionMode() && this->endpoint.hostname.length() && WiFi.status() == WL_CONNECTED) {
+		if (hensor->isProductionMode() && hensor->isSendingOut() && this->endpoint.hostname.length() && WiFi.status() == WL_CONNECTED) {
+			hensor->setSendingOut(false);
 			this->sendOut();
 		}
 	}

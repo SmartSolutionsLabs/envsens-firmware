@@ -143,3 +143,11 @@ void Hensor::holdPressureValue(uint32_t value) {
 Datagas Hensor::getCurrentDatagas() const {
 	return this->currentDatagas;
 }
+
+void Hensor::setSendingOut(bool sending) {
+	this->sendingOut = sending;
+}
+
+bool Hensor::isSendingOut() const {
+	return this->sendingOut;
+}
