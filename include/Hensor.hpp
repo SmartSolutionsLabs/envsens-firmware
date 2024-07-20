@@ -11,6 +11,7 @@
 #include <Preferences.h>
 
 #include "Sensor.hpp"
+#include "Datalogger.hpp"
 
 /**
  * This class has all data and logic.
@@ -41,6 +42,11 @@ class Hensor {
 		 * To decide turning WiFi for production or BLE to configuration.
 		 */
 		bool inProductionMode;
+
+		/**
+		 * All data are resting here.
+		 */
+		Datagas currentDatagas;
 
 	public:
 		static Hensor * getInstance();
@@ -76,6 +82,14 @@ class Hensor {
 		// Control
 		void setProductionMode(bool mode = true);
 		bool isProductionMode() const;
+
+		void holdCO2Value(uint32_t value);
+		void holdNH3Value(uint32_t value);
+		void holdTemperatureValue(uint32_t value);
+		void holdHumidityValue(uint32_t value);
+		void holdPressureValue(uint32_t value);
+
+		Datagas getCurrentDatagas() const;
 };
 
 #endif

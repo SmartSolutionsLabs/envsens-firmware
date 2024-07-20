@@ -122,3 +122,27 @@ void Hensor::setProductionMode(bool mode) {
 bool Hensor::isProductionMode() const {
 	return this->inProductionMode;
 }
+
+void Hensor::holdCO2Value(uint32_t value) {
+	this->currentDatagas.co2 = value;
+}
+
+void Hensor::holdNH3Value(uint32_t value) {
+	this->currentDatagas.nh3 = value;
+}
+
+void Hensor::holdTemperatureValue(uint32_t value) {
+	this->currentDatagas.temperature = value;
+}
+
+void Hensor::holdHumidityValue(uint32_t value) {
+	this->currentDatagas.humidity = value;
+}
+
+void Hensor::holdPressureValue(uint32_t value) {
+	this->currentDatagas.pressure = value;
+}
+
+Datagas Hensor::getCurrentDatagas() const {
+	return this->currentDatagas;
+}
