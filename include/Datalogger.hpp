@@ -21,13 +21,13 @@ void IRAM_ATTR interruptDataSaver(void* arg);
  * Not only for gas.
  */
 struct Datagas {
-	time_t unixtime;
-	uint32_t status; // As read or not
-	uint32_t co2;
-	uint32_t nh3;
-	uint32_t temperature;
-	uint32_t humidity;
-	uint32_t pressure;
+	time_t unixtime = 0;
+	uint32_t status = 0; // As read or not
+	uint32_t co2 = 0;
+	uint32_t nh3 = 0;
+	uint32_t temperature = 0;
+	uint32_t humidity = 0;
+	uint32_t pressure = 0;
 };
 
 /**
