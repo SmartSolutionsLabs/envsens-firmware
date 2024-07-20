@@ -105,9 +105,10 @@ inline void Communicator::sendOut() {
 	}
 	else {
 		Datagas currentDatagas = Hensor::getInstance()->getCurrentDatagas();
+		DateTime dateTime(currentDatagas.unixtime);
 		JsonDocument jsonResponse;
 		jsonResponse["Equipo"] = Hensor::getInstance()->getDeviceName();
-		jsonResponse["FechaHora"] = currentDatagas.unixtime;
+		jsonResponse["FechaHora"] = dateTime.timestamp(DateTime::TIMESTAMP_DATE) + " " + dateTime.timestamp(DateTime::TIMESTAMP_TIME);
 		jsonResponse["CO2"] = currentDatagas.co2;
 		jsonResponse["NH3"] = currentDatagas.nh3;
 		jsonResponse["Temp"] = currentDatagas.temperature;
