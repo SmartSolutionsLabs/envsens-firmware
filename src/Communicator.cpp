@@ -72,8 +72,8 @@ inline void Communicator::sendOut() {
 	static int err;
 	err = 0;
 
-	const char * hostname = const_cast<const String&>(this->endpoint.hostname).c_str();
-	const char * post = const_cast<const String&>(this->endpoint.hostname).c_str();
+	const char * hostname = this->endpoint.hostname.c_str();
+	const char * post = this->endpoint.hostname.c_str();
 
 	this->httpClient->post(hostname, post);
 	if (err == 0) {
@@ -91,6 +91,7 @@ void Communicator::addInstruction(String instruction) {
 
 void Communicator::run(void * data) {
 	static TickType_t delay = 1 / portTICK_PERIOD_MS;
+	static Hensor * hensor = Hensor::getInstance();
 
 	while (1) {
 		vTaskDelay(this->iterationDelay);
@@ -103,28 +104,24 @@ void Communicator::run(void * data) {
 		}
 
 		// If the endpoint is empty we can't send anything
-		if (const_cast<const String&>(this->endpoint.hostname).isEmpty()) {
-			continue;
+		if (hensor->isProductionMode() && this->endpoint.hostname.length() && WiFi.status() == WL_CONNECTED) {
+			this->sendOut();
 		}
-
-		this->sendOut();
 	}
 }
 
 void Communicator::setEndpointHostname(String newHostname) {
-	String& hostname = const_cast<String&>(this->endpoint.hostname);
-	hostname = newHostname;
+	this->endpoint.hostname = newHostname;
 }
 
 inline const String& Communicator::getEndpointHostname() const {
-	return const_cast<const String&>(this->endpoint.hostname);
+	return this->endpoint.hostname;
 }
 
 void Communicator::setEndpointPost(String newPost) {
-	String& post = const_cast<String&>(this->endpoint.hostname);
-	post = newPost;
+	this->endpoint.hostname = newPost;
 }
 
 inline const String& Communicator::getEndpointPost() const {
-	return const_cast<const String&>(this->endpoint.post);
+	return this->endpoint.post;
 }

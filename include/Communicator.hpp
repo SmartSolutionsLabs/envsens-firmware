@@ -27,8 +27,8 @@ class Communicator : public Thread {
 		 * Where is the endpoint.
 		 */
 		struct {
-			volatile String hostname;
-			volatile String post;
+			String hostname;
+			String post;
 		} endpoint;
 
 	public:
