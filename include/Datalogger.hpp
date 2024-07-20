@@ -27,6 +27,7 @@ struct Datagas {
 	uint32_t nh3;
 	uint32_t temperature;
 	uint32_t humidity;
+	uint32_t pressure;
 };
 
 /**
@@ -60,7 +61,7 @@ class Datalogger : public Thread {
 		 * Appends a datagas created with passed parameters.
 		 * Unixtime is gotten inside.
 		 */
-		void append(uint32_t co2, uint32_t nh3, uint32_t temperature, uint32_t humidity);
+		void append(uint32_t co2, uint32_t nh3, uint32_t temperature, uint32_t humidity, uint32_t pressure);
 
 		/**
 		 * Fill the queue that must be empty with records.

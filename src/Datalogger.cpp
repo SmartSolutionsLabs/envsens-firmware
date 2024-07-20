@@ -99,7 +99,7 @@ inline void Datalogger::save() {
 
 	struct dblog_write_context ctx;
 	ctx.buf = buf;
-	ctx.col_count = 6;
+	ctx.col_count = 7;
 	ctx.page_resv_bytes = 0;
 	ctx.page_size_exp = 12;
 	ctx.max_pages_exp = 0;
@@ -118,6 +118,7 @@ inline void Datalogger::save() {
 			res = dblog_set_col_val(&ctx, 3, DBLOG_TYPE_INT, &datagas.nh3, sizeof(uint32_t));
 			res = dblog_set_col_val(&ctx, 4, DBLOG_TYPE_INT, &datagas.temperature, sizeof(uint32_t));
 			res = dblog_set_col_val(&ctx, 5, DBLOG_TYPE_INT, &datagas.humidity, sizeof(uint32_t));
+			res = dblog_set_col_val(&ctx, 6, DBLOG_TYPE_INT, &datagas.pressure, sizeof(uint32_t));
 
 			res = dblog_append_empty_row(&ctx);
 		}
@@ -133,7 +134,7 @@ void Datalogger::append(const Datagas &datagas) {
 	this->queue.enqueue(datagas);
 }
 
-void Datalogger::append(uint32_t co2, uint32_t nh3, uint32_t temperature, uint32_t humidity) {
+void Datalogger::append(uint32_t co2, uint32_t nh3, uint32_t temperature, uint32_t humidity, uint32_t pressure) {
 	Datagas datagas;
 	datagas.unixtime = 0;
 	datagas.status = 0;
@@ -141,6 +142,7 @@ void Datalogger::append(uint32_t co2, uint32_t nh3, uint32_t temperature, uint32
 	datagas.nh3 = nh3;
 	datagas.temperature = temperature;
 	datagas.humidity = humidity;
+	datagas.pressure = pressure;
 
 	this->queue.enqueue(datagas);
 }
@@ -174,6 +176,7 @@ void Datalogger::acquire(ArduinoQueue<Datagas> &datagasQueue) const {
 			const void * nh3Column = (uint32_t *) dblog_read_col_val(&rctx, 3, &col_type);
 			const void * temperatureColumn = (uint32_t *) dblog_read_col_val(&rctx, 4, &col_type);
 			const void * humidityColumn = (uint32_t *) dblog_read_col_val(&rctx, 5, &col_type);
+			const void * pressureColumn = (uint32_t *) dblog_read_col_val(&rctx, 6, &col_type);
 
 			// Set this current row as read
 			dblog_upd_col_val(&rctx, 1, (void *) &alreadyReadStatus);
@@ -185,6 +188,7 @@ void Datalogger::acquire(ArduinoQueue<Datagas> &datagasQueue) const {
 			datagas.nh3 = *(uint32_t *) nh3Column;
 			datagas.temperature = *(uint32_t *) temperatureColumn;
 			datagas.humidity = *(uint32_t *) humidityColumn;
+			datagas.pressure = *(uint32_t *) pressureColumn;
 
 			Serial.print("Unixtime: ");
 			Serial.print(datagas.unixtime);
