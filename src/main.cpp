@@ -1,19 +1,12 @@
 #include "Ble.hpp"
 #include "Hensor.hpp"
-#include "Datalogger.hpp"
 #include "Communicator.hpp"
 
 #define BOOT_PIN 0
 
 Hensor * hensor;
-Datalogger * datalogger;
 
 TickType_t xDelay;
-
-// Controlling motor acceleration
-void IRAM_ATTR interruptDataSaver(void* arg) {
-	datalogger->setSaving();
-}
 
 void setup() {
 	pinMode(BOOT_PIN, INPUT); // Button to change mode BLE/WiFi
@@ -25,9 +18,6 @@ void setup() {
 	hensor->getSensor(SENSOR_MULTI_INDEX)->start();
 	hensor->getSensor(SENSOR_CO2_INDEX)->start();
 	hensor->getSensor(SENSOR_NH3_INDEX)->start();
-
-	datalogger = Datalogger::getInstance();
-	datalogger->start();
 
 	Communicator::getInstance()->start();
 
