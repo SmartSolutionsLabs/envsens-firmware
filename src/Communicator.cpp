@@ -106,6 +106,11 @@ void Communicator::parseIncome(void * data) {
 			jsonResponse["wifi"]["pass"] = wifiPass;
 			jsonResponse["endpoint"]["host"] = this->endpoint.hostname;
 			jsonResponse["endpoint"]["post"] = this->endpoint.post;
+			jsonResponse["k"]["co2"] = hensor->getCO2Multiplier();
+			jsonResponse["k"]["nh3"] = hensor->getNH3Multiplier();
+			jsonResponse["k"]["t"] = hensor->getTemperatureMultiplier();
+			jsonResponse["k"]["humidity"] = hensor->getHumidityMultiplier();
+			jsonResponse["k"]["pressure"] = hensor->getPressureMultiplier();
 
 			break;
 		}

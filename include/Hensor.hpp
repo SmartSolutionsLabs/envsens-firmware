@@ -110,6 +110,11 @@ class Hensor {
 		void setTemperatureMultiplier(float_t multiplier, bool persistent = true);
 		void setHumidityMultiplier(uint32_t multiplier, bool persistent = true);
 		void setPressureMultiplier(uint32_t multiplier, bool persistent = true);
+		uint32_t getCO2Multiplier() const;
+		float_t getNH3Multiplier() const;
+		float_t getTemperatureMultiplier() const;
+		uint32_t getHumidityMultiplier() const;
+		uint32_t getPressureMultiplier() const;
 
 		void holdCO2Value(uint32_t value);
 		void holdNH3Value(float_t value);

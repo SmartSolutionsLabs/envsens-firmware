@@ -182,6 +182,26 @@ void Hensor::setPressureMultiplier(uint32_t multiplier, bool persistent) {
 	this->calibration.pressure = multiplier;
 }
 
+uint32_t Hensor::getCO2Multiplier() const {
+	return this->calibration.co2;
+}
+
+float_t Hensor::getNH3Multiplier() const {
+	return this->calibration.nh3;
+}
+
+float_t Hensor::getTemperatureMultiplier() const {
+	return this->calibration.temperature;
+}
+
+uint32_t Hensor::getHumidityMultiplier() const {
+	return this->calibration.humidity;
+}
+
+uint32_t Hensor::getPressureMultiplier() const {
+	return this->calibration.pressure;
+}
+
 void Hensor::holdCO2Value(uint32_t value) {
 	this->currentDatagas.co2 = value;
 }
