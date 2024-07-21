@@ -24,6 +24,11 @@ Hensor::Hensor() {
 	this->setEndpointPost(this->preferences.getString("post", ""), false);
 	this->setDeviceName(this->preferences.getString("name", ""), false);
 	this->setNetworkInterval(this->preferences.getUInt("interval", 5), false);
+	this->setCO2Multiplier(this->preferences.getUInt("kCO2", 1), false);
+	this->setNH3Multiplier(this->preferences.getFloat("kNH3", 1.0f), false);
+	this->setTemperatureMultiplier(this->preferences.getFloat("kTemperature", 1.0f), false);
+	this->setHumidityMultiplier(this->preferences.getUInt("kHumidity", 1), false);
+	this->setPressureMultiplier(this->preferences.getUInt("kPressure", 1), false);
 	Network::SSID = this->preferences.getString("netSsid", "");
 	Network::PASSWORD = this->preferences.getString("netPassword", "");
 	// To decide if we must turn on WiFi
@@ -135,6 +140,46 @@ void Hensor::setProductionMode(bool mode) {
 
 bool Hensor::isProductionMode() const {
 	return this->inProductionMode;
+}
+
+void Hensor::setCO2Multiplier(uint32_t multiplier, bool persistent) {
+	if (persistent) {
+		this->preferences.putUInt("kCO2", multiplier);
+	}
+
+	this->calibration.co2 = multiplier;
+}
+
+void Hensor::setNH3Multiplier(float_t multiplier, bool persistent) {
+	if (persistent) {
+		this->preferences.putFloat("kNH3", multiplier);
+	}
+
+	this->calibration.nh3 = multiplier;
+}
+
+void Hensor::setTemperatureMultiplier(float_t multiplier, bool persistent) {
+	if (persistent) {
+		this->preferences.putFloat("kTemperature", multiplier);
+	}
+
+	this->calibration.temperature = multiplier;
+}
+
+void Hensor::setHumidityMultiplier(uint32_t multiplier, bool persistent) {
+	if (persistent) {
+		this->preferences.putUInt("kHumidity", multiplier);
+	}
+
+	this->calibration.humidity = multiplier;
+}
+
+void Hensor::setPressureMultiplier(uint32_t multiplier, bool persistent) {
+	if (persistent) {
+		this->preferences.putUInt("kPressure", multiplier);
+	}
+
+	this->calibration.pressure = multiplier;
 }
 
 void Hensor::holdCO2Value(uint32_t value) {

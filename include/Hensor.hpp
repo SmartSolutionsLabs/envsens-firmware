@@ -15,6 +15,17 @@
 #include "Datalogger.hpp"
 
 /**
+ * Hold multiplier constants to datagas values.
+ */
+struct Calibration {
+	uint32_t co2 = 1;
+	float_t nh3 = 1.0f;
+	float_t temperature = 1.0f;
+	uint32_t humidity = 1;
+	uint32_t pressure = 1;
+};
+
+/**
  * This class has all data and logic.
  * It's singleton.
  */
@@ -28,6 +39,8 @@ class Hensor {
 		bool oldBluetoothDeviceConnected = false;
 
 		Sensor * sensors[SENSORS_QUANTITY];
+
+		Calibration calibration;
 
 		/**
 		 * Simple storage for data needed in runtime.
@@ -91,6 +104,12 @@ class Hensor {
 		// Control
 		void setProductionMode(bool mode = true);
 		bool isProductionMode() const;
+
+		void setCO2Multiplier(uint32_t multiplier, bool persistent = true);
+		void setNH3Multiplier(float_t multiplier, bool persistent = true);
+		void setTemperatureMultiplier(float_t multiplier, bool persistent = true);
+		void setHumidityMultiplier(uint32_t multiplier, bool persistent = true);
+		void setPressureMultiplier(uint32_t multiplier, bool persistent = true);
 
 		void holdCO2Value(uint32_t value);
 		void holdNH3Value(float_t value);
