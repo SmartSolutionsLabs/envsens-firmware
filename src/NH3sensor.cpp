@@ -31,7 +31,7 @@ void NH3sensor::run(void* data) {
 		ESP_LOGI(HENSOR_TAG, "Channel data: %d", channelData);
 		ESP_LOGI(HENSOR_TAG, "Voltage: %.2f", voltage);
 
-		hensor->holdNH3Value(voltage);
+		hensor->holdNH3Value(voltage * hensor->getNH3Multiplier());
 	}
 
 	this->stop();
