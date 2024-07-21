@@ -70,6 +70,31 @@ void Communicator::parseIncome(void * data) {
 
 			break;
 		}
+		case 1003: {
+			uint32_t kCO2 = jsonRequest["co2"];
+			float_t kNH3 = jsonRequest["nh3"];
+			float_t kTemperature = jsonRequest["t"];
+			uint32_t kHumidity = jsonRequest["humidity"];
+			uint32_t kPressure = jsonRequest["pressure"];
+
+			if (kCO2) {
+				hensor->setCO2Multiplier(kCO2);
+			}
+			if (kNH3) {
+				hensor->setNH3Multiplier(kNH3);
+			}
+			if (kTemperature) {
+				hensor->setTemperatureMultiplier(kTemperature);
+			}
+			if (kHumidity) {
+				hensor->setHumidityMultiplier(kHumidity);
+			}
+			if (kPressure) {
+				hensor->setPressureMultiplier(kPressure);
+			}
+
+			break;
+		}
 		case 2000: {
 			String wifiSsid, wifiPass;
 			hensor->getWifiCredentials(wifiSsid, wifiPass);
