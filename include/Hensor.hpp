@@ -129,6 +129,8 @@ class Hensor {
 
 		void setTime(String dateTime);
 		DateTime getRtcNow();
+
+		void assemblySensorsStatus(std::string &jsonString) ;
 };
 
 #endif
