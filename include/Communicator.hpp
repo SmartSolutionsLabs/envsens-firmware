@@ -1,0 +1,70 @@
+#ifndef INC_COMMUNICATOR
+#define INC_COMMUNICATOR
+
+#include "Thread.hpp"
+#include "Ble.hpp"
+
+#include <ArduinoQueue.h>
+
+/**
+ * Process every income and outcome.
+ * It's a singleton transceiver.
+ */
+class Communicator : public Thread {
+	protected:
+		static Communicator * communicator;
+		Communicator();
+		Communicator(const char * name);
+		Communicator(const char * name, int taskCore);
+
+		ArduinoQueue<String> instructionsQueue;
+
+	private:
+		/**
+		 * Where is the endpoint.
+		 */
+		struct {
+			String hostname;
+			String post;
+		} endpoint;
+
+		/**
+		 * Lap to send data out.
+		 */
+		uint32_t networkInterval;
+
+	public:
+		// For singleton
+		static Communicator * getInstance();
+		Communicator(Communicator &other) = delete;
+		void operator=(const Communicator &) = delete;
+
+		/**
+		 * All external instrunctions are processed here.
+		 */
+		void parseIncome(void * data);
+
+		/**
+		 * Sends data to exterior.
+		 */
+		inline void sendOut();
+
+		/**
+		 * Append an instruction to queue for processing in the thread.
+		 */
+		void addInstruction(String);
+
+		/**
+		 * Checks if there are new logged data to send them out.
+		 */
+		void run(void * data) override;
+
+		void setEndpointHostname(String hostname);
+		inline const String& getEndpointHostname() const;
+		void setEndpointPost(String post);
+		inline const String& getEndpointPost() const;
+
+		void setNetworkInterval(uint32_t minutes);
+};
+
+#endif

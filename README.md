@@ -1,2 +1,2 @@
-# envsens-firmware
-Firmware for ESP32 to meassure enviorent variables like CO2 , NH3 , Temperature , Humidity and Preassure.
+# Firmware for sensors of environment
+Ready for ESP32 to meassure environment variables: CO2, NH3, temperature, humidity and preassure.
