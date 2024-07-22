@@ -223,17 +223,31 @@ void Communicator::run(void * data) {
 			this->parseIncome(&instruction);
 		}
 
-		// If the endpoint is empty we can't send anything
-		if (hensor->isProductionMode() && !hensor->isSendingOut() && this->endpoint.hostname.length() && WiFi.status() == WL_CONNECTED) {
-			DateTime now = hensor->getRtcNow();
-			currentMinute = now.minute();
+		// Check what time is it because we must send data no matter what mode
+		DateTime now = hensor->getRtcNow();
+		currentMinute = now.minute();
 
-			if (checkedMinute != currentMinute && currentMinute % this->networkInterval == 0) {
-				hensor->setSendingOut(true);
-				checkedMinute = currentMinute;
-				this->sendOut();
-				hensor->setSendingOut(false);
-			}
+		if (checkedMinute == currentMinute) {
+			continue;
+		}
+
+		if (currentMinute % this->networkInterval != 0) {
+			continue;
+		}
+
+		// At passing must change it
+		checkedMinute = currentMinute;
+
+		if( !hensor->isProductionMode() ) {
+			std::string jsonString;
+			hensor->assemblySensorsStatus(jsonString);
+			Ble::bleCallback->writeLargeText(Ble::statusCharacteristic, jsonString);
+		}
+		// If the endpoint is empty we can't send anything
+		else if (hensor->isProductionMode() && !hensor->isSendingOut() && this->endpoint.hostname.length() && WiFi.status() == WL_CONNECTED) {
+			hensor->setSendingOut(true);
+			this->sendOut();
+			hensor->setSendingOut(false);
 		}
 	}
 }
