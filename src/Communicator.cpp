@@ -30,8 +30,35 @@ void Communicator::parseIncome(void * data) {
 
 	jsonResponse["cmd"] = jsonRequest["cmd"];
 	unsigned int cmd = jsonRequest["cmd"];
-
+	jsonResponse["success"] = true;
 	switch(cmd) {
+		case 0: {
+            jsonResponse["nro_serie"] = "989907888588";
+    		jsonResponse["tipo_modelo"] = 1;
+			Serial.println("case 0 , asked");
+            break;
+		}
+        case 1: {
+			jsonResponse["version"] = 1.0f;
+			jsonResponse["relays"] = 1;
+			Serial.println("case 1 , asked");
+			break;
+		}
+		case 2: {
+			jsonResponse["cal"] = true;  //envia estado de calibracion del relay
+			jsonResponse["id"] = 1;
+			jsonResponse["name"] = "test";
+			jsonResponse["vol"] = 100;  // litros
+			jsonResponse["h_dia"] = 6;
+			JsonArray scheduleArray = jsonResponse["horarios"].to<JsonArray>();
+			int schedule[7]= {1,0,0,0,0,0,1};
+			for(int j=0; j<7;j++){
+				JsonArray hoursArray = scheduleArray.add<JsonArray>();
+				copyArray(schedule, hoursArray);
+			}
+			Serial.println("case 2 , asked");
+			break;
+		}
 		case 7: {
 			String ssid = jsonRequest["ssid"];
 			String pass = jsonRequest["pass"];
