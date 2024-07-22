@@ -76,7 +76,7 @@ Example:
 
 #### Configuring Sensor Calibration Constants (cmd: 1003)
 
-To configure sensor calibration constants, use command 1003. Include the following numeric attributes:
+To configure sensor calibration constants, use command 1003. These constants are generally values ​​close to 1. Include any of the following numeric attributes:
 
 	"co2": Integer value for CO2 calibration.
 	"nh3": Decimal value for NH3 calibration.
@@ -87,7 +87,7 @@ To configure sensor calibration constants, use command 1003. Include the followi
 Example:
 
 ```json
-{"cmd": 1003, "co2": 500, "nh3": 0.25, "t": 25.5, "humidity": 60, "pressure": 1013}
+{"cmd": 1003, "co2": 1, "nh3": 1.23, "t": 1.5, "humidity": 1, "pressure": 1}
 ```
 
 #### Retrieving Current Device Values (cmd: 2000)
