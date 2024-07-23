@@ -128,6 +128,13 @@ String Hensor::getDeviceName() const {
 }
 
 void Hensor::setNetworkInterval(uint32_t minutes, bool persistent) {
+	if (minutes < 2) {
+		minutes = 2;
+	}
+	if (minutes > 59) {
+		minutes = 59;
+	}
+
 	if (persistent) {
 		this->preferences.putUInt("interval", minutes);
 	}
@@ -136,6 +143,13 @@ void Hensor::setNetworkInterval(uint32_t minutes, bool persistent) {
 }
 
 void Hensor::setLocalInterval(uint32_t time, bool persistent) {
+	if (time < 2) {
+		time = 2;
+	}
+	if (time > 59) {
+		time = 59;
+	}
+
 	if (persistent) {
 		this->preferences.putUInt("intervalLocal", time);
 	}
