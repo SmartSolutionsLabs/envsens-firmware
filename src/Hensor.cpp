@@ -339,5 +339,16 @@ void Hensor::assemblySensorsStatus(std::string &jsonString) {
 	jsonResponse["data"][i]["l1"] = String(currentDatagas.pressure) + " Pa";
 	jsonResponse["data"][i]["l2"] = "";
 
+	i++;
+	jsonResponse["data"][i]["id"] = i;
+	jsonResponse["data"][i]["s_type"] = 4;
+	jsonResponse["data"][i]["value"] = map(analogRead(15)*3.30/4096,1.98,3.2,0,100);
+	
+	i++;
+	jsonResponse["data"][i]["id"] = i;
+	jsonResponse["data"][i]["s_type"] = 5;
+	jsonResponse["data"][i]["ssid"] = Network::SSID;
+	jsonResponse["data"][i]["ip"] = "";
+	
 	serializeJson(jsonResponse, jsonString);
 }
