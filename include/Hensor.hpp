@@ -100,6 +100,7 @@ class Hensor {
 		void setDeviceName(String name, bool persistent = true);
 		String getDeviceName() const;
 		void setNetworkInterval(uint32_t minutes, bool persistent = true);
+		void setLocalInterval(uint32_t time, bool persistent = true);
 
 		// Control
 		void setProductionMode(bool mode = true);

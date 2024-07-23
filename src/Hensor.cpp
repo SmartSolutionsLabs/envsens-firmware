@@ -25,6 +25,7 @@ Hensor::Hensor() {
 	this->setEndpointPost(this->preferences.getString("post", ""), false);
 	this->setDeviceName(this->preferences.getString("name", ""), false);
 	this->setNetworkInterval(this->preferences.getUInt("interval", 5), false);
+	this->setLocalInterval(this->preferences.getUInt("intervalLocal", 15), false);
 	this->setCO2Multiplier(this->preferences.getUInt("kCO2", 1), false);
 	this->setNH3Multiplier(this->preferences.getFloat("kNH3", 1.0f), false);
 	this->setTemperatureMultiplier(this->preferences.getFloat("kTemperature", 1.0f), false);
@@ -132,6 +133,14 @@ void Hensor::setNetworkInterval(uint32_t minutes, bool persistent) {
 	}
 
 	Communicator::getInstance()->setNetworkInterval(minutes);
+}
+
+void Hensor::setLocalInterval(uint32_t time, bool persistent) {
+	if (persistent) {
+		this->preferences.putUInt("intervalLocal", time);
+	}
+
+	Communicator::getInstance()->setNetworkInterval(time);
 }
 
 void Hensor::setProductionMode(bool mode) {

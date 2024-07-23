@@ -33,6 +33,8 @@ class Communicator : public Thread {
 		 */
 		uint32_t networkInterval;
 
+		uint32_t localInterval;
+
 	public:
 		// For singleton
 		static Communicator * getInstance();
@@ -65,6 +67,7 @@ class Communicator : public Thread {
 		inline const String& getEndpointPost() const;
 
 		void setNetworkInterval(uint32_t minutes);
+		void setLocalInterval(uint32_t time);
 };
 
 #endif

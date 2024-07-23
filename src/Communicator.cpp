@@ -208,6 +208,7 @@ void Communicator::addInstruction(String instruction) {
 void Communicator::run(void * data) {
 	static int checkedMinute = 0;
 	static int currentMinute;
+	static int sendingInterval = hensor->isProductionMode() ? this->localInterval : this->networkInterval;
 	static TickType_t delay = 1 / portTICK_PERIOD_MS;
 	static Hensor * hensor = Hensor::getInstance();
 
@@ -225,13 +226,21 @@ void Communicator::run(void * data) {
 
 		// Check what time is it because we must send data no matter what mode
 		DateTime now = hensor->getRtcNow();
-		currentMinute = now.minute();
 
+		// To do it with seconds for BLE or minutes for WiFi
+		if (hensor->isProductionMode()) {
+			currentMinute = now.second();
+		}
+		else {
+			currentMinute = now.minute();
+		}
+
+		// Do nothing if we did it before
 		if (checkedMinute == currentMinute) {
 			continue;
 		}
 
-		if (currentMinute % this->networkInterval != 0) {
+		if (currentMinute % sendingInterval != 0) {
 			continue;
 		}
 
@@ -270,4 +279,8 @@ inline const String& Communicator::getEndpointPost() const {
 
 void Communicator::setNetworkInterval(uint32_t minutes) {
 	this->networkInterval = minutes;
+}
+
+void Communicator::setLocalInterval(uint32_t time) {
+	this->networkInterval = time;
 }
