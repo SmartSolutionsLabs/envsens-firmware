@@ -1,7 +1,7 @@
 #ifndef INC_HENSOR
 #define INC_HENSOR
 
-#define BLUETOOTH_DEVICE_NAME "Galatea 1"
+#define BLUETOOTH_DEVICE_NAME "Proteus Galatea"
 #define SENSORS_QUANTITY 3
 #define SENSOR_MULTI_INDEX 0
 #define SENSOR_NH3_INDEX 1
