@@ -30,8 +30,35 @@ void Communicator::parseIncome(void * data) {
 
 	jsonResponse["cmd"] = jsonRequest["cmd"];
 	unsigned int cmd = jsonRequest["cmd"];
-
+	jsonResponse["success"] = true;
 	switch(cmd) {
+		case 0: {
+            jsonResponse["nro_serie"] = "989907888588";
+    		jsonResponse["tipo_modelo"] = 1;
+			Serial.println("case 0 , asked");
+            break;
+		}
+        case 1: {
+			jsonResponse["version"] = 1.0f;
+			jsonResponse["relays"] = 1;
+			Serial.println("case 1 , asked");
+			break;
+		}
+		case 2: {
+			jsonResponse["cal"] = true;  //envia estado de calibracion del relay
+			jsonResponse["id"] = 1;
+			jsonResponse["name"] = "test";
+			jsonResponse["vol"] = 100;  // litros
+			jsonResponse["h_dia"] = 6;
+			JsonArray scheduleArray = jsonResponse["horarios"].to<JsonArray>();
+			int schedule[7]= {1,0,0,0,0,0,1};
+			for(int j=0; j<7;j++){
+				JsonArray hoursArray = scheduleArray.add<JsonArray>();
+				copyArray(schedule, hoursArray);
+			}
+			Serial.println("case 2 , asked");
+			break;
+		}
 		case 7: {
 			String ssid = jsonRequest["ssid"];
 			String pass = jsonRequest["pass"];
@@ -183,6 +210,7 @@ void Communicator::run(void * data) {
 	static int currentMinute;
 	static TickType_t delay = 1 / portTICK_PERIOD_MS;
 	static Hensor * hensor = Hensor::getInstance();
+	static int sendingInterval = hensor->isProductionMode() ? this->networkInterval : this->localInterval;
 
 	this->iterationDelay = 10 / portTICK_PERIOD_MS;
 
@@ -196,17 +224,39 @@ void Communicator::run(void * data) {
 			this->parseIncome(&instruction);
 		}
 
-		// If the endpoint is empty we can't send anything
-		if (hensor->isProductionMode() && !hensor->isSendingOut() && this->endpoint.hostname.length() && WiFi.status() == WL_CONNECTED) {
-			DateTime now = hensor->getRtcNow();
-			currentMinute = now.minute();
+		// Check what time is it because we must send data no matter what mode
+		DateTime now = hensor->getRtcNow();
 
-			if (checkedMinute != currentMinute && currentMinute % this->networkInterval == 0) {
-				hensor->setSendingOut(true);
-				checkedMinute = currentMinute;
-				this->sendOut();
-				hensor->setSendingOut(false);
-			}
+		// To do it with seconds for BLE or minutes for WiFi
+		if (hensor->isProductionMode()) {
+			currentMinute = now.minute();
+		}
+		else {
+			currentMinute = now.second();
+		}
+
+		// Do nothing if we did it before
+		if (checkedMinute == currentMinute) {
+			continue;
+		}
+
+		if (currentMinute % sendingInterval != 0) {
+			continue;
+		}
+
+		// At passing must change it
+		checkedMinute = currentMinute;
+
+		if( !hensor->isProductionMode() ) {
+			std::string jsonString;
+			hensor->assemblySensorsStatus(jsonString);
+			Ble::bleCallback->writeLargeText(Ble::statusCharacteristic, jsonString);
+		}
+		// If the endpoint is empty we can't send anything
+		else if (hensor->isProductionMode() && !hensor->isSendingOut() && this->endpoint.hostname.length() && WiFi.status() == WL_CONNECTED) {
+			hensor->setSendingOut(true);
+			this->sendOut();
+			hensor->setSendingOut(false);
 		}
 	}
 }
@@ -229,4 +279,8 @@ inline const String& Communicator::getEndpointPost() const {
 
 void Communicator::setNetworkInterval(uint32_t minutes) {
 	this->networkInterval = minutes;
+}
+
+void Communicator::setLocalInterval(uint32_t time) {
+	this->localInterval = time;
 }

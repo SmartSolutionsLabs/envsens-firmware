@@ -4,6 +4,7 @@
 #include "NH3sensor.hpp"
 #include "CO2sensor.hpp"
 #include "Network.hpp"
+#include <ArduinoJson.h>
 
 #include <Wire.h>
 
@@ -24,6 +25,7 @@ Hensor::Hensor() {
 	this->setEndpointPost(this->preferences.getString("post", ""), false);
 	this->setDeviceName(this->preferences.getString("name", ""), false);
 	this->setNetworkInterval(this->preferences.getUInt("interval", 5), false);
+	this->setLocalInterval(this->preferences.getUInt("intervalLocal", 15), false);
 	this->setCO2Multiplier(this->preferences.getUInt("kCO2", 1), false);
 	this->setNH3Multiplier(this->preferences.getFloat("kNH3", 1.0f), false);
 	this->setTemperatureMultiplier(this->preferences.getFloat("kTemperature", 1.0f), false);
@@ -131,6 +133,14 @@ void Hensor::setNetworkInterval(uint32_t minutes, bool persistent) {
 	}
 
 	Communicator::getInstance()->setNetworkInterval(minutes);
+}
+
+void Hensor::setLocalInterval(uint32_t time, bool persistent) {
+	if (persistent) {
+		this->preferences.putUInt("intervalLocal", time);
+	}
+
+	Communicator::getInstance()->setLocalInterval(time);
 }
 
 void Hensor::setProductionMode(bool mode) {
@@ -251,4 +261,69 @@ void Hensor::setTime(String dateTime) {
 
 DateTime Hensor::getRtcNow() {
 	return this->rtc.now();
+}
+
+void Hensor::assemblySensorsStatus(std::string &jsonString) {
+	Datagas currentDatagas = this->getCurrentDatagas();
+	DateTime dateTime(currentDatagas.unixtime);
+
+	JsonDocument jsonResponse;
+	//jsonResponse["Equipo"] = deviceName;
+	//jsonResponse["FechaHora"] = dateTime.timestamp(DateTime::TIMESTAMP_DATE) + " " + dateTime.timestamp(DateTime::TIMESTAMP_TIME);
+	//jsonResponse["CO2"] = currentDatagas.co2;
+	//jsonResponse["NH3"] = currentDatagas.nh3;
+	//jsonResponse["Temp"] = currentDatagas.temperature;
+	//jsonResponse["HR"] = currentDatagas.humidity;
+	//jsonResponse["PR"] = currentDatagas.pressure;
+
+	int i = 1;
+	jsonResponse["data"][i]["id"] = i;
+	jsonResponse["data"][i]["s_type"] = 6;
+	jsonResponse["data"][i]["name"] = "Equipo";
+	jsonResponse["data"][i]["l1"] = deviceName;
+	jsonResponse["data"][i]["l2"] = "";
+
+	i++;
+	jsonResponse["data"][i]["id"] = i;
+	jsonResponse["data"][i]["s_type"] = 6;
+	jsonResponse["data"][i]["name"] = "Hora de Sistema";
+	jsonResponse["data"][i]["l1"] = dateTime.timestamp(DateTime::TIMESTAMP_DATE);
+	jsonResponse["data"][i]["l2"] = dateTime.timestamp(DateTime::TIMESTAMP_TIME);
+
+	i++;
+	jsonResponse["data"][i]["id"] = i;
+	jsonResponse["data"][i]["s_type"] = 6;
+	jsonResponse["data"][i]["name"] = "CO2";
+	jsonResponse["data"][i]["l1"] = String(currentDatagas.co2) + " PPM";
+	jsonResponse["data"][i]["l2"] = "";
+
+	i++;
+	jsonResponse["data"][i]["id"] = i;
+	jsonResponse["data"][i]["s_type"] = 6;
+	jsonResponse["data"][i]["name"] = "NH3";
+	jsonResponse["data"][i]["l1"] = String(currentDatagas.nh3)+ " PPM";
+	jsonResponse["data"][i]["l2"] = "";
+
+	i++;
+	jsonResponse["data"][i]["id"] = i;
+	jsonResponse["data"][i]["s_type"] = 6;
+	jsonResponse["data"][i]["name"] = "Temperature";
+	jsonResponse["data"][i]["l1"] = String(currentDatagas.temperature) + " °C";
+	jsonResponse["data"][i]["l2"] = "";
+
+	i++;
+	jsonResponse["data"][i]["id"] = i;
+	jsonResponse["data"][i]["s_type"] = 6;
+	jsonResponse["data"][i]["name"] = "Humidity";
+	jsonResponse["data"][i]["l1"] = String(currentDatagas.humidity) + " %";
+	jsonResponse["data"][i]["l2"] = "";
+
+	i++;
+	jsonResponse["data"][i]["id"] = i;
+	jsonResponse["data"][i]["s_type"] = 6;
+	jsonResponse["data"][i]["name"] = "Pressure";
+	jsonResponse["data"][i]["l1"] = String(currentDatagas.pressure) + " Pa";
+	jsonResponse["data"][i]["l2"] = "";
+
+	serializeJson(jsonResponse, jsonString);
 }
