@@ -33,7 +33,7 @@ void Communicator::parseIncome(void * data) {
 	jsonResponse["success"] = true;
 	switch(cmd) {
 		case 0: {
-            jsonResponse["nro_serie"] = "989907888601";
+            jsonResponse["nro_serie"] = "989907888588";
     		jsonResponse["tipo_modelo"] = 1;
 			Serial.println("case 0 , asked");
             break;
@@ -94,10 +94,10 @@ void Communicator::parseIncome(void * data) {
 			break;
 		}
 		case 1002: {
-			uint32_t interval = jsonRequest["lap"];
-
+			uint32_t interval = jsonRequest["lap-wifi"];
+			uint32_t localinterval = jsonRequest["lap-ble"];
 			hensor->setNetworkInterval(interval);
-
+			hensor->setLocalInterval(localinterval);
 			break;
 		}
 		case 1003: {
