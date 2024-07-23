@@ -208,9 +208,9 @@ void Communicator::addInstruction(String instruction) {
 void Communicator::run(void * data) {
 	static int checkedMinute = 0;
 	static int currentMinute;
-	static int sendingInterval = hensor->isProductionMode() ? this->localInterval : this->networkInterval;
 	static TickType_t delay = 1 / portTICK_PERIOD_MS;
 	static Hensor * hensor = Hensor::getInstance();
+	static int sendingInterval = hensor->isProductionMode() ? this->networkInterval : this->localInterval;
 
 	this->iterationDelay = 10 / portTICK_PERIOD_MS;
 
