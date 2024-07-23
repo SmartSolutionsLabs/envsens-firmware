@@ -140,7 +140,7 @@ void Hensor::setLocalInterval(uint32_t time, bool persistent) {
 		this->preferences.putUInt("intervalLocal", time);
 	}
 
-	Communicator::getInstance()->setNetworkInterval(time);
+	Communicator::getInstance()->setLocalInterval(time);
 }
 
 void Hensor::setProductionMode(bool mode) {

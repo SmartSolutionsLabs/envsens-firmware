@@ -229,10 +229,10 @@ void Communicator::run(void * data) {
 
 		// To do it with seconds for BLE or minutes for WiFi
 		if (hensor->isProductionMode()) {
-			currentMinute = now.second();
+			currentMinute = now.minute();
 		}
 		else {
-			currentMinute = now.minute();
+			currentMinute = now.second();
 		}
 
 		// Do nothing if we did it before
@@ -282,5 +282,5 @@ void Communicator::setNetworkInterval(uint32_t minutes) {
 }
 
 void Communicator::setLocalInterval(uint32_t time) {
-	this->networkInterval = time;
+	this->localInterval = time;
 }
