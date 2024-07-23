@@ -1,5 +1,16 @@
-EQUIPO 2:{
+EQUIPO 3:{
     SERIE = 989907888616; 
     V_MAX = 5.193v;
     R0_NH3 = 98800;
+} 
+EQUIPO 2:{
+    SERIE = 989907888588; 
+    V_MAX = 5.115v;
+    R0_NH3 = 98700;
+} 
+EQUIPO 1:{
+    SERIE = 989907888601; 
+    V_MAX = 5.069v;
+    R0_NH3 = 98400;
+    CO2= OK;
 } 

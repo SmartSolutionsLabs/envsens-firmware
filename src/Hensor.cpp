@@ -290,7 +290,7 @@ void Hensor::assemblySensorsStatus(std::string &jsonString) {
 	//jsonResponse["HR"] = currentDatagas.humidity;
 	//jsonResponse["PR"] = currentDatagas.pressure;
 
-	int i = 1;
+	int i = 0;
 	jsonResponse["data"][i]["id"] = i;
 	jsonResponse["data"][i]["s_type"] = 6;
 	jsonResponse["data"][i]["name"] = "Equipo";
@@ -322,7 +322,7 @@ void Hensor::assemblySensorsStatus(std::string &jsonString) {
 	jsonResponse["data"][i]["id"] = i;
 	jsonResponse["data"][i]["s_type"] = 6;
 	jsonResponse["data"][i]["name"] = "Temperature";
-	jsonResponse["data"][i]["l1"] = String(currentDatagas.temperature) + " °C";
+	jsonResponse["data"][i]["l1"] = String(currentDatagas.temperature) + " C";
 	jsonResponse["data"][i]["l2"] = "";
 
 	i++;

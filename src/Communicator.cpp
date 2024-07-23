@@ -33,7 +33,7 @@ void Communicator::parseIncome(void * data) {
 	jsonResponse["success"] = true;
 	switch(cmd) {
 		case 0: {
-            jsonResponse["nro_serie"] = "989907888588";
+            jsonResponse["nro_serie"] = "989907888601";
     		jsonResponse["tipo_modelo"] = 1;
 			Serial.println("case 0 , asked");
             break;
@@ -57,6 +57,9 @@ void Communicator::parseIncome(void * data) {
 				copyArray(schedule, hoursArray);
 			}
 			Serial.println("case 2 , asked");
+			break;
+		}
+		case 6: {
 			break;
 		}
 		case 7: {
