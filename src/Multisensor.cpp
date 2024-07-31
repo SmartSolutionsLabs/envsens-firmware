@@ -31,8 +31,10 @@ void Multisensor::run(void* data) {
 		ESP_LOGI(HENSOR_TAG, "Humidity(C): %.2f", this->sensor->humidity);
 		ESP_LOGI(HENSOR_TAG, "Pressure(C): %d", this->sensor->pressure);
 
-		hensor->holdTemperatureValue(this->sensor->temperature * hensor->getTemperatureMultiplier());
-		hensor->holdHumidityValue(this->sensor->humidity * hensor->getHumidityMultiplier());
+		hensor->holdTemperatureValue(hensor->FunctionTemperatureCalibrated(this->sensor->temperature));
+		// * hensor->getTemperatureMultiplier());
+		hensor->holdHumidityValue(hensor->FunctionHumidityCalibrated(this->sensor->humidity));
+		// * hensor->getHumidityMultiplier());
 		hensor->holdPressureValue(this->sensor->pressure * hensor->getPressureMultiplier());
 	}
 

@@ -1,7 +1,7 @@
 #ifndef INC_HENSOR
 #define INC_HENSOR
 
-#define BLUETOOTH_DEVICE_NAME "Proteus G-2"
+#define BLUETOOTH_DEVICE_NAME "Proteus G-1"
 #define SENSORS_QUANTITY 3
 #define SENSOR_MULTI_INDEX 0
 #define SENSOR_NH3_INDEX 1
@@ -21,7 +21,7 @@ struct Calibration {
 	uint32_t co2 = 1;
 	float_t nh3 = 1.0f;
 	float_t temperature = 1.0f;
-	uint32_t humidity = 1;
+	float_t humidity = 1.0f;
 	uint32_t pressure = 1;
 };
 
@@ -109,18 +109,21 @@ class Hensor {
 		void setCO2Multiplier(uint32_t multiplier, bool persistent = true);
 		void setNH3Multiplier(float_t multiplier, bool persistent = true);
 		void setTemperatureMultiplier(float_t multiplier, bool persistent = true);
-		void setHumidityMultiplier(uint32_t multiplier, bool persistent = true);
+		void setHumidityMultiplier(float_t multiplier, bool persistent = true);
 		void setPressureMultiplier(uint32_t multiplier, bool persistent = true);
 		uint32_t getCO2Multiplier() const;
 		float_t getNH3Multiplier() const;
 		float_t getTemperatureMultiplier() const;
-		uint32_t getHumidityMultiplier() const;
+		float_t getHumidityMultiplier() const;
 		uint32_t getPressureMultiplier() const;
+
+		float_t FunctionTemperatureCalibrated(float_t meassuredTemperature);
+		float_t FunctionHumidityCalibrated(float_t mh);
 
 		void holdCO2Value(uint32_t value);
 		void holdNH3Value(float_t value);
 		void holdTemperatureValue(float_t value);
-		void holdHumidityValue(uint32_t value);
+		void holdHumidityValue(float_t value);
 		void holdPressureValue(uint32_t value);
 
 		Datagas getCurrentDatagas();

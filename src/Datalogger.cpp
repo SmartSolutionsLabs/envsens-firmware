@@ -134,7 +134,7 @@ void Datalogger::append(const Datagas &datagas) {
 	this->queue.enqueue(datagas);
 }
 
-void Datalogger::append(uint32_t co2, float_t nh3, float_t temperature, uint32_t humidity, uint32_t pressure) {
+void Datalogger::append(uint32_t co2, float_t nh3, float_t temperature, float_t humidity, uint32_t pressure) {
 	Datagas datagas;
 	datagas.unixtime = 0;
 	datagas.status = 0;

@@ -33,7 +33,7 @@ void Communicator::parseIncome(void * data) {
 	jsonResponse["success"] = true;
 	switch(cmd) {
 		case 0: {
-            jsonResponse["nro_serie"] = "989907888588";
+            jsonResponse["nro_serie"] = "989907888616";
     		jsonResponse["tipo_modelo"] = 1;
 			Serial.println("case 0 , asked");
             break;
@@ -104,7 +104,7 @@ void Communicator::parseIncome(void * data) {
 			uint32_t kCO2 = jsonRequest["co2"];
 			float_t kNH3 = jsonRequest["nh3"];
 			float_t kTemperature = jsonRequest["t"];
-			uint32_t kHumidity = jsonRequest["humidity"];
+			float_t kHumidity = jsonRequest["humidity"];
 			uint32_t kPressure = jsonRequest["pressure"];
 
 			if (kCO2) {

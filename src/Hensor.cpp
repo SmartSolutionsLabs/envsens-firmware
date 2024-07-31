@@ -7,6 +7,7 @@
 #include <ArduinoJson.h>
 
 #include <Wire.h>
+static const char * HENSOR_TAG = "Hensor";
 
 Hensor * Hensor::hensor = nullptr;
 
@@ -29,7 +30,7 @@ Hensor::Hensor() {
 	this->setCO2Multiplier(this->preferences.getUInt("kCO2", 1), false);
 	this->setNH3Multiplier(this->preferences.getFloat("kNH3", 1.0f), false);
 	this->setTemperatureMultiplier(this->preferences.getFloat("kTemperature", 1.0f), false);
-	this->setHumidityMultiplier(this->preferences.getUInt("kHumidity", 1), false);
+	this->setHumidityMultiplier(this->preferences.getFloat("kHumidity", 1), false);
 	this->setPressureMultiplier(this->preferences.getUInt("kPressure", 1), false);
 	Network::SSID = this->preferences.getString("netSsid", "");
 	Network::PASSWORD = this->preferences.getString("netPassword", "");
@@ -190,9 +191,9 @@ void Hensor::setTemperatureMultiplier(float_t multiplier, bool persistent) {
 	this->calibration.temperature = multiplier;
 }
 
-void Hensor::setHumidityMultiplier(uint32_t multiplier, bool persistent) {
+void Hensor::setHumidityMultiplier(float_t multiplier, bool persistent) {
 	if (persistent) {
-		this->preferences.putUInt("kHumidity", multiplier);
+		this->preferences.putFloat("kHumidity", multiplier);
 	}
 
 	this->calibration.humidity = multiplier;
@@ -218,12 +219,24 @@ float_t Hensor::getTemperatureMultiplier() const {
 	return this->calibration.temperature;
 }
 
-uint32_t Hensor::getHumidityMultiplier() const {
+float_t Hensor::getHumidityMultiplier() const {
 	return this->calibration.humidity;
 }
 
 uint32_t Hensor::getPressureMultiplier() const {
 	return this->calibration.pressure;
+}
+
+float_t Hensor::FunctionTemperatureCalibrated(float_t meassuredTemperature){
+	// LINEAR FUNCTION T = A * X + B
+	float_t T = 1.0588 * meassuredTemperature - 14.728;
+	return T;
+}
+
+float_t Hensor::FunctionHumidityCalibrated(float_t mh){
+	// POLINOMIAL GRADE 3 FUNCTION H = A * X^3 + B * X^2 + C * X + D
+	float_t H = 0.0073 * mh * mh * mh - 0.7689 * mh * mh + 0 * mh - 272.2;
+	return H;
 }
 
 void Hensor::holdCO2Value(uint32_t value) {
@@ -238,7 +251,7 @@ void Hensor::holdTemperatureValue(float_t value) {
 	this->currentDatagas.temperature = value;
 }
 
-void Hensor::holdHumidityValue(uint32_t value) {
+void Hensor::holdHumidityValue(float_t value) {
 	this->currentDatagas.humidity = value;
 }
 
@@ -343,7 +356,7 @@ void Hensor::assemblySensorsStatus(std::string &jsonString) {
 	jsonResponse["data"][i]["id"] = i;
 	jsonResponse["data"][i]["s_type"] = 4;
 	jsonResponse["data"][i]["value"] = map(analogRead(15)*3.30/4096,1.98,3.2,0,100);
-	
+	ESP_LOGI(HENSOR_TAG, "Battery-Voltage: %.2f", analogRead(15)*3.30/4096);
 	i++;
 	jsonResponse["data"][i]["id"] = i;
 	jsonResponse["data"][i]["s_type"] = 5;
