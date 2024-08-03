@@ -14,7 +14,7 @@ void NH3sensor::connect(void * data) {
 }
 
 uint32_t  NH3sensor::getPPM(float voltage){
-	this->R0 = 98800;
+	this->R0 = 98400;
 	this->maxVoltage = 5.193;
 	this->RS = (R0*voltage)/(maxVoltage - voltage);
 	this->nh3_read_value = (voltage * this->R0) / (maxVoltage - voltage);
