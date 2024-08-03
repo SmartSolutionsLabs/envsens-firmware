@@ -1,7 +1,7 @@
 #ifndef INC_HENSOR
 #define INC_HENSOR
 
-#define BLUETOOTH_DEVICE_NAME "Proteus G-1"
+#define BLUETOOTH_DEVICE_NAME "Proteus G-2"
 #define SENSORS_QUANTITY 3
 #define SENSOR_MULTI_INDEX 0
 #define SENSOR_NH3_INDEX 1
@@ -52,6 +52,7 @@ class Hensor {
 		 */
 		String deviceName;
 
+		String deviceSerialNumber;
 		/**
 		 * To decide turning WiFi for production or BLE to configuration.
 		 */
@@ -99,6 +100,10 @@ class Hensor {
 		// Initial parameters in boot
 		void setDeviceName(String name, bool persistent = true);
 		String getDeviceName() const;
+
+		void setDeviceSerialNumber(String serialNumber, bool persistent = true);
+		String getDeviceSerialNumber() const;
+
 		void setNetworkInterval(uint32_t minutes, bool persistent = true);
 		void setLocalInterval(uint32_t time, bool persistent = true);
 
