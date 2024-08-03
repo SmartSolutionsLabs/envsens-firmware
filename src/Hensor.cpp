@@ -296,16 +296,17 @@ bool Hensor::isSendingOut() const {
 
 bool Hensor::hasSentOnTime(int time) {
 	// Get the previous time
-	int sentTime = this->preferences.getUInt("sent", -1);
+	int sentTime = this->preferences.getInt("sent", -1);
 
 	// When the times are the same, means we sent previously
 	if (sentTime == time) {
-		this->preferences.putUInt("sent", time);
 		return true;
 	}
 
+	// Has not been set before so update it
+	ESP_LOGI(HENSOR_TAG, "Test time: %d; new time: %d", sentTime, time);
+	this->preferences.putInt("sent", time);
 	return false;
-
 }
 
 void Hensor::setTime(String dateTime) {
