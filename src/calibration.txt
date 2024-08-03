@@ -2,7 +2,7 @@ EQUIPO 3:{
     SERIE = 989907888616; 
     V_MAX = 5.193v;
     R0_NH3 = 98800;
-    T = 0.99276 *  meassuredTemperature - 9.96233;
+    T = 0.848 *  meassuredTemperature - 5.9688;
     H = 0.00623 * mh * mh * mh - 0.52882 * mh * mh + 15.18842 * mh - 86.82952;
 } 
 EQUIPO 2:{
@@ -18,5 +18,12 @@ EQUIPO 1:{
     R0_NH3 = 98400;
     CO2= OK;
     T = 1.0588 * meassuredTemperature - 14.728;
-    H = 0.0073x3 - 0,7689x2 - 272.2;
+    T - 2.4488 / 0.9757= 
+    H = 0.0073 * mh * mh * mh - 0,7689 * mh * mh - 272.2;
 } 
+
+
+temperature{
+    G2 = 1.0174 * G1 - 1.22;
+    G2 = 0.9868 * G3 - 0.4349;
+}
