@@ -1,6 +1,5 @@
 #include "Communicator.hpp"
 #include "Hensor.hpp"
-
 #include <ArduinoJson.h>
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
@@ -33,7 +32,7 @@ void Communicator::parseIncome(void * data) {
 	jsonResponse["success"] = true;
 	switch(cmd) {
 		case 0: {
-            jsonResponse["nro_serie"] = "989907888616";
+            jsonResponse["nro_serie"] = hensor->getDeviceSerialNumber();
     		jsonResponse["tipo_modelo"] = 1;
 			Serial.println("case 0 , asked");
             break;
@@ -79,9 +78,9 @@ void Communicator::parseIncome(void * data) {
 		}
 		case 1000: {
 			String name = jsonRequest["name"];
-
+			String serialNumber = jsonRequest["serialNumber"];
 			hensor->setDeviceName(name);
-
+			hensor->setDeviceSerialNumber(serialNumber);
 			break;
 		}
 		case 1001: {
@@ -130,6 +129,7 @@ void Communicator::parseIncome(void * data) {
 			hensor->getWifiCredentials(wifiSsid, wifiPass);
 			DateTime now = hensor->getRtcNow();
 			jsonResponse["name"] = hensor->getDeviceName();
+			jsonResponse["serialNumber"] = hensor->getDeviceSerialNumber();
 			jsonResponse["interval"] = this->networkInterval;
 			jsonResponse["time"] = now.timestamp(DateTime::TIMESTAMP_FULL);
 			jsonResponse["wifi"]["ssid"] = wifiSsid;
@@ -167,13 +167,17 @@ inline void Communicator::sendOut() {
 		Datagas currentDatagas = Hensor::getInstance()->getCurrentDatagas();
 		DateTime dateTime(currentDatagas.unixtime);
 		JsonDocument jsonResponse;
-		jsonResponse["Equipo"] = Hensor::getInstance()->getDeviceName();
-		jsonResponse["FechaHora"] = dateTime.timestamp(DateTime::TIMESTAMP_DATE) + " " + dateTime.timestamp(DateTime::TIMESTAMP_TIME);
-		jsonResponse["CO2"] = currentDatagas.co2;
-		jsonResponse["NH3"] = currentDatagas.nh3;
-		jsonResponse["Temp"] = currentDatagas.temperature;
-		jsonResponse["HR"] = currentDatagas.humidity;
-		jsonResponse["PR"] = currentDatagas.pressure;
+		jsonResponse["equipo"] = Hensor::getInstance()->getDeviceName();
+		jsonResponse["fechahora"] = dateTime.timestamp(DateTime::TIMESTAMP_DATE) + " " + dateTime.timestamp(DateTime::TIMESTAMP_TIME);
+		jsonResponse["co2"] = currentDatagas.co2;
+		jsonResponse["nh3"] = currentDatagas.nh3;
+		jsonResponse["temp"] = currentDatagas.temperature;
+		jsonResponse["hr"] = currentDatagas.humidity;
+		jsonResponse["pr"] = currentDatagas.pressure;
+		float readed_battery = analogRead(15)*3.30/4096;
+		if(readed_battery > 3.10 ) readed_battery = 3.10;
+		float percentage = (readed_battery - 2.00)*100/1.1;
+		jsonResponse["pila"] = percentage ;
 		String body;
 		serializeJson(jsonResponse, body);
 
