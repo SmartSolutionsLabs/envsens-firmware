@@ -254,6 +254,11 @@ void Communicator::run(void * data) {
 		// At passing must change it
 		checkedMinute = currentMinute;
 
+		// Sent before on time?
+		if (hensor->hasSentOnTime(checkedMinute)) {
+			continue;
+		}
+
 		if( !hensor->isProductionMode() ) {
 			std::string jsonString;
 			hensor->assemblySensorsStatus(jsonString);

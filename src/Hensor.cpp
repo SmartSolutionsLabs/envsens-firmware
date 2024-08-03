@@ -244,7 +244,7 @@ float_t Hensor::FunctionTemperatureCalibrated(float_t meassuredTemperature){
 	// LINEAR FUNCTION T = A * X + B
 	//float_t T = 1.10493 *  meassuredTemperature - 16.30762;
 	//float_t T =  1.0315 * meassuredTemperature - 0.9325; // G-1
-	//float_t T = 1.0079 * meassuredTemperature + 0.4623; // G-3 
+	//float_t T = 1.0079 * meassuredTemperature + 0.4623; // G-3
 	float_t  T = meassuredTemperature; // G-2
 	return T;
 }
@@ -292,6 +292,20 @@ void Hensor::setSendingOut(bool sending) {
 
 bool Hensor::isSendingOut() const {
 	return this->sendingOut;
+}
+
+bool Hensor::hasSentOnTime(int time) {
+	// Get the previous time
+	int sentTime = this->preferences.getUInt("sent", -1);
+
+	// When the times are the same, means we sent previously
+	if (sentTime == time) {
+		this->preferences.putUInt("sent", time);
+		return true;
+	}
+
+	return false;
+
 }
 
 void Hensor::setTime(String dateTime) {
@@ -394,6 +408,6 @@ void Hensor::assemblySensorsStatus(std::string &jsonString) {
 	jsonResponse["data"][i]["s_type"] = 5;
 	jsonResponse["data"][i]["ssid"] = Network::SSID;
 	jsonResponse["data"][i]["ip"] = "";
-	
+
 	serializeJson(jsonResponse, jsonString);
 }
