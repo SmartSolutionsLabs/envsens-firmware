@@ -24,19 +24,9 @@ void setup() {
 	hensor->getSensor(SENSOR_CO2_INDEX)->start();
 	hensor->getSensor(SENSOR_NH3_INDEX)->start();
 
-	Communicator::getInstance()->start();
-
 	// We can't enable BLE & WiFi at the same time: https://github.com/espressif/esp-idf/issues/12414
 	// and that's why we enable just one
-	if ( !hensor->isProductionMode() ) {
-		// We turn on safetly
-		Ble * ble = new Ble(BLUETOOTH_DEVICE_NAME);
-
-		digitalWrite(CONFIG_STATUS_LED_PIN, HIGH);
-
-		digitalWrite(NETWORK_STATUS_LED_PIN, LOW); // By the way
-	}
-	else {
+	if ( hensor->isProductionMode() ) {
 		digitalWrite(CONFIG_STATUS_LED_PIN, LOW); // By the way
 
 		// Blinking for calling attention. End with led off.
@@ -44,7 +34,20 @@ void setup() {
 			digitalWrite(NETWORK_STATUS_LED_PIN, i & 1 ? LOW : HIGH);
 			vTaskDelay(xDelay);
 		}
+
+		hensor->connectWiFi();
 	}
+	else {
+		// We turn on safetly
+		Ble * ble = new Ble(BLUETOOTH_DEVICE_NAME);
+
+		digitalWrite(CONFIG_STATUS_LED_PIN, HIGH);
+
+		digitalWrite(NETWORK_STATUS_LED_PIN, LOW); // By the way
+	}
+
+	// To send data
+	Communicator::getInstance()->start();
 }
 
 

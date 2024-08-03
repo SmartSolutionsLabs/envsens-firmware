@@ -34,9 +34,7 @@ Hensor::Hensor() {
 	Network::SSID = this->preferences.getString("netSsid", "");
 	Network::PASSWORD = this->preferences.getString("netPassword", "");
 	// To decide if we must turn on WiFi
-	if( this->inProductionMode = this->preferences.getBool("inProduction", false) ) {
-		Network::getInstance()->connect();
-	}
+	this->inProductionMode = this->preferences.getBool("inProduction", false);
 
 	// Only change pins because already started in master mode
 	Wire.setPins(5, 4);
@@ -95,6 +93,10 @@ void Hensor::setWifiCredentials(String &ssid, String &password) {
 
 	Network::PASSWORD = password;
 	this->preferences.putString("netPassword", password);
+}
+
+void Hensor::connectWiFi() const {
+	Network::getInstance()->connect();
 }
 
 void Hensor::setEndpointHostname(String hostname, bool persistent) {

@@ -91,6 +91,7 @@ class Hensor {
 		// About WiFi
 		void getWifiCredentials(String &ssid, String &password) const;
 		void setWifiCredentials(String &ssid, String &password);
+		void connectWiFi() const;
 
 		// About HTTP endpoints
 		void setEndpointHostname(String hostname, bool persistent = true);
