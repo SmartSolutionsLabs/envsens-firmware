@@ -17,7 +17,7 @@ void CO2sensor::run(void* data) {
 		this->stop();
 	}
 
-	this->iterationDelay = 15000 / portTICK_PERIOD_MS;
+	this->iterationDelay = 5000 / portTICK_PERIOD_MS;
 
 	Hensor * hensor = Hensor::getInstance();
 
