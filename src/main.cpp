@@ -1,6 +1,7 @@
 #include "Ble.hpp"
 #include "Hensor.hpp"
 #include "Communicator.hpp"
+#include "Network.hpp"
 
 Hensor * hensor;
 
@@ -44,6 +45,7 @@ void setup() {
 			digitalWrite(NETWORK_STATUS_LED_PIN, i & 1 ? LOW : HIGH);
 			vTaskDelay(xDelay);
 		}
+		Network::getInstance()->connect();
 	}
 }
 

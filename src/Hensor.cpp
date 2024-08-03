@@ -251,10 +251,10 @@ float_t Hensor::FunctionTemperatureCalibrated(float_t meassuredTemperature){
 
 float_t Hensor::FunctionHumidityCalibrated(float_t mh){
 	// POLINOMIAL GRADE 3 FUNCTION H = A * X^3 + B * X^2 + C * X + D
-	//float_t H = 0.00623 * mh * mh * mh - 0.52882 * mh * mh + 15.18842 * mh - 86.82952;
+	//float_t H = 0.00623 * mh * mh * mh - 0.52882 * mh * mh + 15.18842 * mh - 86.82952; // G-3
 	//float_t H = 0.0073 * mh * mh * mh - 0.7689 * mh * mh - 272.2; // G-1
-	float_t H = 0.00533 * mh * mh * mh - 0.42805 * mh * mh + 11.90744 * mh - 51.83372;// G-2
-	//H = mh;
+	//float_t H = 0.00533 * mh * mh * mh - 0.42805 * mh * mh + 11.90744 * mh - 51.83372;// G-2
+	float_t H = mh;
 	if(H < 0) H = 0;
 	if(H > 100 ) H = 100;
 	return H;
