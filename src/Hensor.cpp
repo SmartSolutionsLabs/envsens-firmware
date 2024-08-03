@@ -25,6 +25,7 @@ Hensor::Hensor() {
 	this->setEndpointHostname(this->preferences.getString("hostname", ""), false);
 	this->setEndpointPost(this->preferences.getString("post", ""), false);
 	this->setDeviceName(this->preferences.getString("name", ""), false);
+	this->setDeviceSerialNumber(this->preferences.getString("serialNumber", ""), false);
 	this->setNetworkInterval(this->preferences.getUInt("interval", 5), false);
 	this->setLocalInterval(this->preferences.getUInt("intervalLocal", 15), false);
 	this->setCO2Multiplier(this->preferences.getUInt("kCO2", 1), false);
@@ -36,7 +37,7 @@ Hensor::Hensor() {
 	Network::PASSWORD = this->preferences.getString("netPassword", "");
 	// To decide if we must turn on WiFi
 	if( this->inProductionMode = this->preferences.getBool("inProduction", false) ) {
-		Network::getInstance()->connect();
+		//Network::getInstance()->connect();
 	}
 
 	// Only change pins because already started in master mode
@@ -125,7 +126,19 @@ void Hensor::setDeviceName(String name, bool persistent) {
 }
 
 String Hensor::getDeviceName() const {
-	return this->deviceName;
+	return this->deviceSerialNumber;
+}
+
+void Hensor::setDeviceSerialNumber(String serialNumber, bool persistent) {
+	if (persistent) {
+		this->preferences.putString("serialNumber", serialNumber);
+	}
+
+	this->deviceSerialNumber = serialNumber;
+}
+
+String Hensor::getDeviceSerialNumber() const {
+	return this->deviceSerialNumber;
 }
 
 void Hensor::setNetworkInterval(uint32_t minutes, bool persistent) {
@@ -229,13 +242,21 @@ uint32_t Hensor::getPressureMultiplier() const {
 
 float_t Hensor::FunctionTemperatureCalibrated(float_t meassuredTemperature){
 	// LINEAR FUNCTION T = A * X + B
-	float_t T = 1.0588 * meassuredTemperature - 14.728;
+	//float_t T = 1.10493 *  meassuredTemperature - 16.30762;
+	//float_t T =  1.0315 * meassuredTemperature - 0.9325; // G-1
+	//float_t T = 1.0079 * meassuredTemperature + 0.4623; // G-3 
+	float_t  T = meassuredTemperature; // G-2
 	return T;
 }
 
 float_t Hensor::FunctionHumidityCalibrated(float_t mh){
 	// POLINOMIAL GRADE 3 FUNCTION H = A * X^3 + B * X^2 + C * X + D
-	float_t H = 0.0073 * mh * mh * mh - 0.7689 * mh * mh + 0 * mh - 272.2;
+	//float_t H = 0.00623 * mh * mh * mh - 0.52882 * mh * mh + 15.18842 * mh - 86.82952;
+	//float_t H = 0.0073 * mh * mh * mh - 0.7689 * mh * mh - 272.2; // G-1
+	float_t H = 0.00533 * mh * mh * mh - 0.42805 * mh * mh + 11.90744 * mh - 51.83372;// G-2
+	//H = mh;
+	if(H < 0) H = 0;
+	if(H > 100 ) H = 100;
 	return H;
 }
 
@@ -342,7 +363,7 @@ void Hensor::assemblySensorsStatus(std::string &jsonString) {
 	jsonResponse["data"][i]["id"] = i;
 	jsonResponse["data"][i]["s_type"] = 6;
 	jsonResponse["data"][i]["name"] = "Humidity";
-	jsonResponse["data"][i]["l1"] = String(currentDatagas.humidity) + " %";
+	jsonResponse["data"][i]["l1"] = String(abs(currentDatagas.humidity)) + " %";
 	jsonResponse["data"][i]["l2"] = "";
 
 	i++;
@@ -352,11 +373,22 @@ void Hensor::assemblySensorsStatus(std::string &jsonString) {
 	jsonResponse["data"][i]["l1"] = String(currentDatagas.pressure) + " Pa";
 	jsonResponse["data"][i]["l2"] = "";
 
+	//i++;
+	//jsonResponse["data"][i]["id"] = i;
+	//jsonResponse["data"][i]["s_type"] = 4;
+	//jsonResponse["data"][i]["value"] = map(analogRead(15)*3.30/4096,1.98,3.2,0,100);
+	//ESP_LOGI(HENSOR_TAG, "Battery-Voltage: %.2f", analogRead(15)*3.30/4096);
+
 	i++;
 	jsonResponse["data"][i]["id"] = i;
-	jsonResponse["data"][i]["s_type"] = 4;
-	jsonResponse["data"][i]["value"] = map(analogRead(15)*3.30/4096,1.98,3.2,0,100);
+	jsonResponse["data"][i]["s_type"] = 6;
+	jsonResponse["data"][i]["name"] = "Battery";
+	float readed_battery = analogRead(15)*3.30/4096;
+	if(readed_battery > 3.10 ) readed_battery = 3.10;
+	jsonResponse["data"][i]["l1"] = String((readed_battery - 2.00)*100/1.1) + "%";
+	jsonResponse["data"][i]["l2"] = String(analogRead(15)*3.30/4096);
 	ESP_LOGI(HENSOR_TAG, "Battery-Voltage: %.2f", analogRead(15)*3.30/4096);
+
 	i++;
 	jsonResponse["data"][i]["id"] = i;
 	jsonResponse["data"][i]["s_type"] = 5;
