@@ -26,13 +26,16 @@ Hensor::Hensor() {
 	this->setEndpointPost(this->preferences.getString("post", ""), false);
 	this->setDeviceName(this->preferences.getString("name", ""), false);
 	this->setDeviceSerialNumber(this->preferences.getString("serialNumber", ""), false);
-	this->setNetworkInterval(this->preferences.getUInt("interval", 5), false);
-	this->setLocalInterval(this->preferences.getUInt("intervalLocal", 15), false);
-	this->setCO2Multiplier(this->preferences.getUInt("kCO2", 1), false);
-	this->setNH3Multiplier(this->preferences.getFloat("kNH3", 1.0f), false);
-	this->setTemperatureMultiplier(this->preferences.getFloat("kTemperature", 1.0f), false);
-	this->setHumidityMultiplier(this->preferences.getFloat("kHumidity", 1), false);
-	this->setPressureMultiplier(this->preferences.getUInt("kPressure", 1), false);
+	this->setNetworkInterval(this->preferences.getUInt("interval", 2), false);
+	this->setLocalInterval(this->preferences.getUInt("intervalLocal", 2), false);
+	this->setCO2Calibration (this->preferences.getFloat("co2_a", 1.0f), this->preferences.getFloat("co2_b", 1.0f), false);
+	//(float_t nh3_m ,float_t nh3_n ,uint32_t nh3_R0 ,float_t nh3_maxV 
+	this->setNH3Calibration  (this->preferences.getFloat("nh3_m", -1.800f), this->preferences.getFloat("nh3_n", -0.163f),
+							this->preferences.getUInt("nh3_R0", 98400),this->preferences.getFloat("nh3_maxV", 5.193f),
+							 false);
+	this->setTemperatureCalibration(this->preferences.getFloat("t_a", 1.0f), this->preferences.getFloat("t_b", 1.0f), false);
+	this->setHumidityCalibration   (this->preferences.getFloat("h_a", 1.0f), this->preferences.getFloat("h_b", 1.0f), false);
+	this->setPressureCalibration   (this->preferences.getFloat("p_a", 1.0f), this->preferences.getFloat("p_b", 1.0f), false);
 	Network::SSID = this->preferences.getString("netSsid", "");
 	Network::PASSWORD = this->preferences.getString("netPassword", "");
 	// To decide if we must turn on WiFi
@@ -180,72 +183,72 @@ bool Hensor::isProductionMode() const {
 	return this->inProductionMode;
 }
 
-void Hensor::setCO2Multiplier(uint32_t multiplier, bool persistent) {
+void Hensor::setTemperatureCalibration(float_t t_a, float_t t_b, bool persistent) {
 	if (persistent) {
-		this->preferences.putUInt("kCO2", multiplier);
+		this->preferences.putFloat("t_a", t_a);
+		this->preferences.putFloat("t_b", t_b);
 	}
 
-	this->calibration.co2 = multiplier;
+	this->calibration.t_a = t_a;
+	this->calibration.t_b = t_b;
 }
 
-void Hensor::setNH3Multiplier(float_t multiplier, bool persistent) {
+void Hensor::setHumidityCalibration(float_t h_a, float_t h_b, bool persistent) {
 	if (persistent) {
-		this->preferences.putFloat("kNH3", multiplier);
+		this->preferences.putFloat("h_a", h_a);
+		this->preferences.putFloat("h_b", h_b);
 	}
 
-	this->calibration.nh3 = multiplier;
+	this->calibration.h_a = h_a;
+	this->calibration.h_b = h_b;
 }
 
-void Hensor::setTemperatureMultiplier(float_t multiplier, bool persistent) {
+void Hensor::setPressureCalibration(float_t p_a, float_t p_b, bool persistent) {
 	if (persistent) {
-		this->preferences.putFloat("kTemperature", multiplier);
+		this->preferences.putFloat("p_a", p_a);
+		this->preferences.putFloat("p_b", p_b);
 	}
 
-	this->calibration.temperature = multiplier;
+	this->calibration.p_a = p_a;
+	this->calibration.p_b = p_b;
 }
 
-void Hensor::setHumidityMultiplier(float_t multiplier, bool persistent) {
+void Hensor::setCO2Calibration(float_t co2_a, float_t co2_b, bool persistent){
 	if (persistent) {
-		this->preferences.putFloat("kHumidity", multiplier);
+		this->preferences.putFloat("co2_a", co2_a);
+		this->preferences.putFloat("co2_b", co2_b);
 	}
 
-	this->calibration.humidity = multiplier;
+	this->calibration.co2_a = co2_a;
+	this->calibration.co2_b = co2_b;
 }
 
-void Hensor::setPressureMultiplier(uint32_t multiplier, bool persistent) {
+void Hensor::setNH3Calibration(float_t nh3_m ,float_t nh3_n ,uint32_t nh3_R0 ,float_t nh3_maxV , bool persistent){
 	if (persistent) {
-		this->preferences.putUInt("kPressure", multiplier);
+		this->preferences.putFloat("nh3_m", nh3_m);
+		this->preferences.putFloat("nh3_n", nh3_n);
+		this->preferences.putUInt("nh3_R0", nh3_R0);
+		this->preferences.putFloat("nh3_maxV", nh3_maxV);
 	}
 
-	this->calibration.pressure = multiplier;
+	this->calibration.nh3_m = nh3_m;
+	this->calibration.nh3_n = nh3_n;
+	this->calibration.nh3_R0 = nh3_R0;
+	this->calibration.nh3_maxV = nh3_maxV;
 }
 
-uint32_t Hensor::getCO2Multiplier() const {
-	return this->calibration.co2;
-}
-
-float_t Hensor::getNH3Multiplier() const {
-	return this->calibration.nh3;
-}
-
-float_t Hensor::getTemperatureMultiplier() const {
-	return this->calibration.temperature;
-}
-
-float_t Hensor::getHumidityMultiplier() const {
-	return this->calibration.humidity;
-}
-
-uint32_t Hensor::getPressureMultiplier() const {
-	return this->calibration.pressure;
-}
-
-float_t Hensor::FunctionTemperatureCalibrated(float_t meassuredTemperature){
+float_t Hensor::FunctionTemperatureCalibrated(float_t mt){
 	// LINEAR FUNCTION T = A * X + B
 	//float_t T = 1.10493 *  meassuredTemperature - 16.30762;
 	//float_t T =  1.0315 * meassuredTemperature - 0.9325; // G-1
+<<<<<<< Updated upstream
 	//float_t T = 1.0079 * meassuredTemperature + 0.4623; // G-3 
 	float_t  T = meassuredTemperature; // G-2
+=======
+	//float_t T = 1.0079 * meassuredTemperature + 0.4623; // G-3
+	//float_t T = mt; // G-2
+	float_t  T = mt * this->calibration.t_a + this->calibration.t_b; 
+>>>>>>> Stashed changes
 	return T;
 }
 
@@ -254,17 +257,109 @@ float_t Hensor::FunctionHumidityCalibrated(float_t mh){
 	//float_t H = 0.00623 * mh * mh * mh - 0.52882 * mh * mh + 15.18842 * mh - 86.82952; // G-3
 	//float_t H = 0.0073 * mh * mh * mh - 0.7689 * mh * mh - 272.2; // G-1
 	//float_t H = 0.00533 * mh * mh * mh - 0.42805 * mh * mh + 11.90744 * mh - 51.83372;// G-2
-	float_t H = mh;
+	float_t H = mh * this->calibration.h_a + this->calibration.h_b;
 	if(H < 0) H = 0;
 	if(H > 100 ) H = 100;
 	return H;
+}
+
+float_t Hensor::FunctionPressureCalibrated(float_t mp){
+	float_t P = mp * this->calibration.p_a + this->calibration.p_b;
+	return P;
+}
+
+uint32_t Hensor::FunctionNH3Calibrated(float_t nh3){
+	//this->calibration.nh3_R0 = 98400;
+	//this->calibration.nh3_maxVoltage = 5.193;
+
+	float_t nh3_read_value = (nh3 * this->calibration.nh3_R0) / (this->calibration.nh3_maxV - nh3);
+	
+	// uint32_t nh3_in_ppm = pow(10, -1.8 * log(nh3_read_value/this->calibration.R0)/log(10) - 0.163);
+	uint32_t nh3_in_ppm = pow(10, this->calibration.nh3_m * log(nh3_read_value/this->calibration.nh3_R0)/log(10) + this->calibration.nh3_n);
+
+	return nh3_in_ppm;	
+}
+
+uint32_t Hensor::FunctionCO2Calibrated(float_t co2){
+	uint32_t co2_in_ppm = uint32_t(this->calibration.co2_a * co2 + this->calibration.co2_b);
+	return co2_in_ppm;
+}
+
+float_t Hensor::getTemperatureCalibration(int index){
+	float_t aux;
+	if(index == 0){
+		aux = this->calibration.t_a;
+		return aux;
+	}
+	if(index == 1){
+		aux = this->calibration.t_b;
+		return aux;
+	}
+	return 0;
+}
+
+float_t Hensor::getHumidityCalibration(int index){
+	if(index == 0){
+		return this->calibration.h_a;
+	}
+	if(index == 1){
+		return this->calibration.h_b;
+	}
+	return 0;
+}
+
+float_t Hensor::getPressureCalibration(int index){
+	float_t aux;
+	if(index == 0){
+		aux = this->calibration.p_a;
+		return aux;
+	}
+	if(index == 1){
+		aux = this->calibration.p_b;
+		return aux;
+	}
+	return 0;
+}
+
+float_t Hensor::getNH3Calibration(int index){
+	float_t aux;
+	if(index == 0){
+		aux = this->calibration.nh3_m;
+		return aux;
+	}
+	if(index == 1){
+		aux = this->calibration.nh3_n;
+		return aux;
+	}
+	if(index == 2){
+		aux = this->calibration.nh3_R0;
+		return aux;
+	}
+	if(index == 3){
+		aux = this->calibration.nh3_maxV;
+		return aux;
+	}
+	return 0;
+}
+
+float_t Hensor::getCO2Calibration(int index){
+	float_t aux ;
+	if(index == 0){
+		aux = this->calibration.co2_a; 
+		return aux;
+	}
+	if(index == 1){
+		aux = this->calibration.co2_b; 
+		return aux;
+	}
+	return 0;
 }
 
 void Hensor::holdCO2Value(uint32_t value) {
 	this->currentDatagas.co2 = value;
 }
 
-void Hensor::holdNH3Value(float_t value) {
+void Hensor::holdNH3Value(uint32_t value) {
 	this->currentDatagas.nh3 = value;
 }
 
@@ -316,13 +411,6 @@ void Hensor::assemblySensorsStatus(std::string &jsonString) {
 	DateTime dateTime(currentDatagas.unixtime);
 
 	JsonDocument jsonResponse;
-	//jsonResponse["Equipo"] = deviceName;
-	//jsonResponse["FechaHora"] = dateTime.timestamp(DateTime::TIMESTAMP_DATE) + " " + dateTime.timestamp(DateTime::TIMESTAMP_TIME);
-	//jsonResponse["CO2"] = currentDatagas.co2;
-	//jsonResponse["NH3"] = currentDatagas.nh3;
-	//jsonResponse["Temp"] = currentDatagas.temperature;
-	//jsonResponse["HR"] = currentDatagas.humidity;
-	//jsonResponse["PR"] = currentDatagas.pressure;
 
 	int i = 0;
 	jsonResponse["data"][i]["id"] = i;
