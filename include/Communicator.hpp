@@ -49,7 +49,7 @@ class Communicator : public Thread {
 		/**
 		 * Sends data to exterior.
 		 */
-		inline void sendOut();
+		void sendOut();
 
 		/**
 		 * Append an instruction to queue for processing in the thread.
