@@ -12,10 +12,7 @@
 
 class Network {
 	private:
-<<<<<<< Updated upstream
-=======
 		const char* MyHostName = "Galatea G-3";
->>>>>>> Stashed changes
 	protected:
 		static Network * network;
 		Network();
