@@ -138,6 +138,7 @@ class Hensor {
 
 		void setSendingOut(bool sending = true);
 		bool isSendingOut() const;
+		bool hasSentOnTime(int time);
 
 		void setTime(String dateTime);
 		DateTime getRtcNow();

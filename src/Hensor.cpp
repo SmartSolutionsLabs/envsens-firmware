@@ -395,6 +395,19 @@ bool Hensor::isSendingOut() const {
 	return this->sendingOut;
 }
 
+bool Hensor::hasSentOnTime(int time) {
+	// Get the previous recorded time
+	int sentTime = this->preferences.getInt("sentTime", -1);
+
+	// When the times are the same, means we sent previously
+	if (sentTime == time) {
+		return true;
+	}
+
+	this->preferences.putInt("sentTime", time);
+	return false;
+}
+
 void Hensor::setTime(String dateTime) {
 	if (this->rtcAvailable) {
 		this->rtc.adjust(DateTime(
