@@ -168,7 +168,7 @@ void Communicator::parseIncome(void * data) {
 	Ble::bleCallback->writeLargeText(Ble::resCharacteristic, answer);
 }
 
-inline void Communicator::sendOut() {
+void Communicator::sendOut() {
 	WiFiClientSecure httpClient;
 	httpClient.setInsecure();
 
