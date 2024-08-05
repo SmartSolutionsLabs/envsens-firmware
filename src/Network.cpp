@@ -16,9 +16,10 @@ Network * Network::getInstance() {
 
 Network::Network() : server(80) {
 	WiFi.mode(WIFI_STA);
-
+	WiFi.setHostname(this->MyHostName);
 	server.on("/", HTTP_GET, [](AsyncWebServerRequest * request) {
-		request->send(200, "text/plain", "This is the ESP HTTP server.");
+		String msg = "This is " + (String)WiFi.getHostname();
+		request->send(200, "text/plain", msg);
 	});
 
 	// Start AsyncElegantOTA
@@ -54,6 +55,9 @@ void Network::onConnected(WiFiEvent_t event, WiFiEventInfo_t info) {
 	Serial.print("WiFi.connected\n");
 }
 
+void Network::setHostName(const char* MyHostName){
+	WiFi.setHostname(MyHostName);
+}
 void Network::onAddressed(WiFiEvent_t event, WiFiEventInfo_t info) {
 	digitalWrite(NETWORK_STATUS_LED_PIN, HIGH);
 	Serial.print("WiFi.addressed: ");

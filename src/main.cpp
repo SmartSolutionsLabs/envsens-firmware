@@ -45,7 +45,9 @@ void setup() {
 			digitalWrite(NETWORK_STATUS_LED_PIN, i & 1 ? LOW : HIGH);
 			vTaskDelay(xDelay);
 		}
+		Network::getInstance()->setHostName(hensor->getDeviceName().c_str());
 		Network::getInstance()->connect();
+		
 	}
 }
 
