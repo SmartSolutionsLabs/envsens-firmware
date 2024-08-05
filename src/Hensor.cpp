@@ -402,12 +402,7 @@ bool Hensor::hasSentOnTime(int sendingInterval) {
 	DateTime now = this->rtc.now();
 
 	// To do it with seconds for BLE or minutes for WiFi
-	if (this->inProductionMode) {
-		currentTime = now.minute();
-	}
-	else {
-		currentTime = now.second();
-	}
+	currentTime = this->inProductionMode ? now.minute() : now.second();
 
 	if (currentTime % sendingInterval != 0) {
 		// True because this interval of time is not needed
