@@ -276,8 +276,11 @@ void Communicator::run(void * data) {
 			hensor->assemblySensorsStatus(jsonString);
 			Ble::bleCallback->writeLargeText(Ble::statusCharacteristic, jsonString);
 		}
-		// If the endpoint is empty we can't send anything
-		else if (hensor->isProductionMode() && !hensor->isSendingOut() && this->endpoint.hostname.length() && WiFi.status() == WL_CONNECTED) {
+		// Here is for production mode
+		// it was not sent before
+		// if the endpoint is empty we can't send anything
+		// if there is WiFi connection
+		else if (!hensor->hasSentOnTime(checkedMinute) && !hensor->isSendingOut() && this->endpoint.hostname.length() && WiFi.status() == WL_CONNECTED) {
 			hensor->setSendingOut(true);
 			this->sendOut();
 			hensor->setSendingOut(false);
