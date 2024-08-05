@@ -77,8 +77,10 @@ void Communicator::parseIncome(void * data) {
 		case 1000: {
 			String name = jsonRequest["name"];
 			String serialNumber = jsonRequest["serialNumber"];
+			String bluetoothName = jsonRequest["bluetoothName"];
 			hensor->setDeviceName(name);
 			hensor->setDeviceSerialNumber(serialNumber);
+			hensor->setBluetoothName(bluetoothName);
 			break;
 		}
 		case 1001: {

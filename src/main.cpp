@@ -31,7 +31,7 @@ void setup() {
 	// and that's why we enable just one
 	if ( !hensor->isProductionMode() ) {
 		// We turn on safetly
-		Ble * ble = new Ble(BLUETOOTH_DEVICE_NAME);
+		Ble * ble = new Ble(hensor->getBluetoothName().c_str());
 
 		digitalWrite(CONFIG_STATUS_LED_PIN, HIGH);
 
