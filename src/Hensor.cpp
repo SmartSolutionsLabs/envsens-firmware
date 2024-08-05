@@ -26,6 +26,7 @@ Hensor::Hensor() {
 	this->setEndpointPost(this->preferences.getString("post", ""), false);
 	this->setDeviceName(this->preferences.getString("name", ""), false);
 	this->setDeviceSerialNumber(this->preferences.getString("serialNumber", ""), false);
+	this->setBluetoothName(this->preferences.getString("btName", "Proteus"), false);
 	this->setNetworkInterval(this->preferences.getUInt("interval", 2), false);
 	this->setLocalInterval(this->preferences.getUInt("intervalLocal", 2), false);
 	this->setCO2Calibration (this->preferences.getFloat("co2_a", 1.0f), this->preferences.getFloat("co2_b", 1.0f), false);
@@ -136,12 +137,22 @@ void Hensor::setDeviceSerialNumber(String serialNumber, bool persistent) {
 	if (persistent) {
 		this->preferences.putString("serialNumber", serialNumber);
 	}
-
 	this->deviceSerialNumber = serialNumber;
 }
 
 String Hensor::getDeviceSerialNumber() const {
 	return this->deviceSerialNumber;
+}
+
+void Hensor::setBluetoothName(String bluetoothName, bool persistent){
+	if (persistent) {
+		this->preferences.putString("btName", bluetoothName);
+	}
+	this->deviceBluetoothName = bluetoothName;
+}
+
+String Hensor::getBluetoothName() const{
+	return this->deviceBluetoothName;
 }
 
 void Hensor::setNetworkInterval(uint32_t minutes, bool persistent) {
@@ -242,13 +253,17 @@ float_t Hensor::FunctionTemperatureCalibrated(float_t mt){
 	//float_t T = 1.10493 *  meassuredTemperature - 16.30762;
 	//float_t T =  1.0315 * meassuredTemperature - 0.9325; // G-1
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 	//float_t T = 1.0079 * meassuredTemperature + 0.4623; // G-3 
 	float_t  T = meassuredTemperature; // G-2
 =======
+=======
+	//float_t T = 1.0079 * meassuredTemperature + 0.4623; // G-3
+	//float_t  T = meassuredTemperature; // G-2
+>>>>>>> Stashed changes
 	//float_t T = 1.0079 * meassuredTemperature + 0.4623; // G-3
 	//float_t T = mt; // G-2
 	float_t  T = mt * this->calibration.t_a + this->calibration.t_b; 
->>>>>>> Stashed changes
 	return T;
 }
 
