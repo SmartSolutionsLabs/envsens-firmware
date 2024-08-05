@@ -169,6 +169,9 @@ void Communicator::parseIncome(void * data) {
 }
 
 void Communicator::sendOut() {
+	// Catch here so more accurate
+	Datagas currentDatagas = Hensor::getInstance()->getCurrentDatagas();
+
 	WiFiClientSecure httpClient;
 	httpClient.setInsecure();
 
@@ -178,7 +181,7 @@ void Communicator::sendOut() {
 		return;
 	}
 	else {
-		Datagas currentDatagas = Hensor::getInstance()->getCurrentDatagas();
+		// Process datagas catched at start
 		DateTime dateTime(currentDatagas.unixtime);
 		JsonDocument jsonResponse;
 		jsonResponse["equipo"] = Hensor::getInstance()->getDeviceName();
