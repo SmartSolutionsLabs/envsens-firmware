@@ -230,8 +230,6 @@ void Communicator::addInstruction(String instruction) {
 }
 
 void Communicator::run(void * data) {
-	static int checkedMinute = 0;
-	static int currentMinute;
 	static TickType_t delay = 1 / portTICK_PERIOD_MS;
 	static Hensor * hensor = Hensor::getInstance();
 	static int sendingInterval = hensor->isProductionMode() ? this->networkInterval : this->localInterval;
@@ -248,28 +246,9 @@ void Communicator::run(void * data) {
 			this->parseIncome(&instruction);
 		}
 
-		// Check what time is it because we must send data no matter what mode
-		DateTime now = hensor->getRtcNow();
-
-		// To do it with seconds for BLE or minutes for WiFi
-		if (hensor->isProductionMode()) {
-			currentMinute = now.minute();
-		}
-		else {
-			currentMinute = now.second();
-		}
-
-		// Do nothing if we did it before
-		if (checkedMinute == currentMinute) {
+		if (hensor->hasSentOnTime(sendingInterval)) {
 			continue;
 		}
-
-		if (currentMinute % sendingInterval != 0) {
-			continue;
-		}
-
-		// At passing must change it
-		checkedMinute = currentMinute;
 
 		if( !hensor->isProductionMode() ) {
 			std::string jsonString;
@@ -277,10 +256,9 @@ void Communicator::run(void * data) {
 			Ble::bleCallback->writeLargeText(Ble::statusCharacteristic, jsonString);
 		}
 		// Here is for production mode
-		// it was not sent before
 		// if the endpoint is empty we can't send anything
 		// if there is WiFi connection
-		else if (!hensor->hasSentOnTime(checkedMinute) && !hensor->isSendingOut() && this->endpoint.hostname.length() && WiFi.status() == WL_CONNECTED) {
+		else if (!hensor->isSendingOut() && this->endpoint.hostname.length() && WiFi.status() == WL_CONNECTED) {
 			hensor->setSendingOut(true);
 			this->sendOut();
 			hensor->setSendingOut(false);

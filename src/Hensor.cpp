@@ -395,16 +395,34 @@ bool Hensor::isSendingOut() const {
 	return this->sendingOut;
 }
 
-bool Hensor::hasSentOnTime(int time) {
+bool Hensor::hasSentOnTime(int sendingInterval) {
+	static int currentTime;
+
+	// Check what time is it because we must send data no matter what mode
+	DateTime now = hensor->getRtcNow();
+
+	// To do it with seconds for BLE or minutes for WiFi
+	if (this->inProductionMode) {
+		currentTime = now.minute();
+	}
+	else {
+		currentTime = now.second();
+	}
+
+	if (currentTime % sendingInterval != 0) {
+		// True because this interval of time is not needed
+		return true;
+	}
+
 	// Get the previous recorded time
 	int sentTime = this->preferences.getInt("sentTime", -1);
 
 	// When the times are the same, means we sent previously
-	if (sentTime == time) {
+	if (sentTime == currentTime) {
 		return true;
 	}
 
-	this->preferences.putInt("sentTime", time);
+	this->preferences.putInt("sentTime", currentTime);
 	return false;
 }
 
