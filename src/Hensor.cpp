@@ -252,17 +252,8 @@ float_t Hensor::FunctionTemperatureCalibrated(float_t mt){
 	// LINEAR FUNCTION T = A * X + B
 	//float_t T = 1.10493 *  meassuredTemperature - 16.30762;
 	//float_t T =  1.0315 * meassuredTemperature - 0.9325; // G-1
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-	//float_t T = 1.0079 * meassuredTemperature + 0.4623; // G-3 
-	float_t  T = meassuredTemperature; // G-2
-=======
-=======
 	//float_t T = 1.0079 * meassuredTemperature + 0.4623; // G-3
-	//float_t  T = meassuredTemperature; // G-2
->>>>>>> Stashed changes
-	//float_t T = 1.0079 * meassuredTemperature + 0.4623; // G-3
-	//float_t T = mt; // G-2
+	//float_t  T = mt; // G-2
 	float_t  T = mt * this->calibration.t_a + this->calibration.t_b; 
 	return T;
 }
