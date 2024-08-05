@@ -40,7 +40,6 @@ void Communicator::parseIncome(void * data) {
         case 1: {
 			jsonResponse["version"] = 1.0f;
 			jsonResponse["relays"] = 1;
-			Serial.println("case 1 , asked");
 			break;
 		}
 		case 2: {
@@ -55,7 +54,6 @@ void Communicator::parseIncome(void * data) {
 				JsonArray hoursArray = scheduleArray.add<JsonArray>();
 				copyArray(schedule, hoursArray);
 			}
-			Serial.println("case 2 , asked");
 			break;
 		}
 		case 6: {
@@ -100,26 +98,33 @@ void Communicator::parseIncome(void * data) {
 			break;
 		}
 		case 1003: {
-			uint32_t kCO2 = jsonRequest["co2"];
-			float_t kNH3 = jsonRequest["nh3"];
-			float_t kTemperature = jsonRequest["t"];
-			float_t kHumidity = jsonRequest["humidity"];
-			uint32_t kPressure = jsonRequest["pressure"];
+			float_t CO2_a = jsonRequest["CO2_a"];
+			float_t CO2_b = jsonRequest["CO2_b"];
+			float_t NH3_m = jsonRequest["NH3_m"];
+			float_t NH3_n = jsonRequest["NH3_n"];
+			uint32_t NH3_R0 = jsonRequest["NH3_R0"];
+			float_t NH3_maxV= jsonRequest["NH3_maxV"];
+			float_t T_a = jsonRequest["T_a"];
+			float_t T_b = jsonRequest["T_b"];
+			float_t H_a = jsonRequest["H_a"];
+			float_t H_b = jsonRequest["H_b"];
+			float_t P_a = jsonRequest["P_a"];
+			float_t P_b = jsonRequest["P_b"];
 
-			if (kCO2) {
-				hensor->setCO2Multiplier(kCO2);
+			if (CO2_a) {
+				hensor->setCO2Calibration(CO2_a, CO2_b, true);
 			}
-			if (kNH3) {
-				hensor->setNH3Multiplier(kNH3);
+			if (NH3_m) {
+				hensor->setNH3Calibration(NH3_m, NH3_n, NH3_R0, NH3_maxV, true);
 			}
-			if (kTemperature) {
-				hensor->setTemperatureMultiplier(kTemperature);
+			if (T_a) {
+				hensor->setTemperatureCalibration(T_a, T_b, true);
 			}
-			if (kHumidity) {
-				hensor->setHumidityMultiplier(kHumidity);
+			if (H_a) {
+				hensor->setHumidityCalibration(H_a, H_b, true);
 			}
-			if (kPressure) {
-				hensor->setPressureMultiplier(kPressure);
+			if (P_a) {
+				hensor->setPressureCalibration(P_a, P_b, true);
 			}
 
 			break;
@@ -136,12 +141,19 @@ void Communicator::parseIncome(void * data) {
 			jsonResponse["wifi"]["pass"] = wifiPass;
 			jsonResponse["endpoint"]["host"] = this->endpoint.hostname;
 			jsonResponse["endpoint"]["post"] = this->endpoint.post;
-			jsonResponse["k"]["co2"] = hensor->getCO2Multiplier();
-			jsonResponse["k"]["nh3"] = hensor->getNH3Multiplier();
-			jsonResponse["k"]["t"] = hensor->getTemperatureMultiplier();
-			jsonResponse["k"]["humidity"] = hensor->getHumidityMultiplier();
-			jsonResponse["k"]["pressure"] = hensor->getPressureMultiplier();
 
+			jsonResponse["CO2_a"] = hensor->getCO2Calibration(0);
+			jsonResponse["CO2_b"] = hensor->getCO2Calibration(1);
+			jsonResponse["NH3_m"] =    hensor->getNH3Calibration(0);
+			jsonResponse["NH3_n"] =    hensor->getNH3Calibration(1);
+			jsonResponse["NH3_R0"] =   hensor->getNH3Calibration(2);
+			jsonResponse["NH3_maxV"] = hensor->getNH3Calibration(3);
+			jsonResponse["T_a"] = hensor->getTemperatureCalibration(0);
+			jsonResponse["T_b"] = hensor->getTemperatureCalibration(1);
+			jsonResponse["H_a"] = hensor->getHumidityCalibration(0);
+			jsonResponse["H_b"] = hensor->getHumidityCalibration(1);
+			jsonResponse["P_a"] = hensor->getPressureCalibration(0);
+			jsonResponse["P_b"] = hensor->getPressureCalibration(1);
 			break;
 		}
 		default:

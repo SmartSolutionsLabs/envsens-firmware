@@ -29,10 +29,10 @@ void CO2sensor::run(void* data) {
 			continue;
 		}
 
-		ESP_LOGI(HENSOR_TAG, "Temperature(C): %.2f", this->sensor->getTemperature());
-		ESP_LOGI(HENSOR_TAG, "CO2(ppm): %d", this->sensor->getCO2());
+		ESP_LOGI(HENSOR_TAG, "Temperature CO2 (C): %.2f", this->sensor->getTemperature());
+		ESP_LOGI(HENSOR_TAG, "CO2(ppm): %d", hensor->FunctionCO2Calibrated(this->sensor->getCO2()));
 
-		hensor->holdCO2Value(this->sensor->getCO2() * hensor->getCO2Multiplier());
+		hensor->holdCO2Value(hensor->FunctionCO2Calibrated(this->sensor->getCO2()));
 	}
 
 	this->stop();

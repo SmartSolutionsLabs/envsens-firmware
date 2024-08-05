@@ -16,23 +16,10 @@ class NH3sensor : public Sensor {
 
 		void run(void* data) override;
 
-		uint32_t  getPPM(float voltage);
 	private:
 		int16_t channelData;
 
 		float voltage;
-
-		uint32_t R0;
-
-		float maxVoltage;
-
-		uint32_t RS;
-
-		float SR;
-
-		uint32_t nh3_in_ppm;
-
-		float nh3_read_value;
 };
 
 #endif
