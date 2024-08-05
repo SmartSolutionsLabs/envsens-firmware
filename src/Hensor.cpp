@@ -399,7 +399,7 @@ bool Hensor::hasSentOnTime(int sendingInterval) {
 	static int currentTime;
 
 	// Check what time is it because we must send data no matter what mode
-	DateTime now = hensor->getRtcNow();
+	DateTime now = this->rtc.now();
 
 	// To do it with seconds for BLE or minutes for WiFi
 	if (this->inProductionMode) {
