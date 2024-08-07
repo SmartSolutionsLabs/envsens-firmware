@@ -3,6 +3,7 @@
 #include <ArduinoJson.h>
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
+#include "Network.hpp"
 
 static const char * HENSOR_TAG = "Hensor";
 
@@ -171,10 +172,12 @@ void Communicator::parseIncome(void * data) {
 void Communicator::sendOut() {
 	// Catch here so more accurate
 	Datagas currentDatagas = Hensor::getInstance()->getCurrentDatagas();
-
+	if(WiFi.status() != WL_CONNECTED){
+		Network::getInstance()->connect();
+	}
+	
 	WiFiClientSecure httpClient;
 	httpClient.setInsecure();
-
 	if (!httpClient.connect(this->endpoint.hostname.c_str(), 443)) {
 		Serial.print("Failed connection to ");
 		Serial.println(this->endpoint.hostname);
