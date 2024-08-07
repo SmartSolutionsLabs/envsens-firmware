@@ -75,6 +75,11 @@ void Communicator::parseIncome(void * data) {
 
 			break;
 		}
+		case 10:{
+			hensor->setProductionMode( !hensor->isProductionMode() ); // toggle
+			esp_restart(); // Everything is ended
+			break;
+		}
 		case 1000: {
 			String name = jsonRequest["name"];
 			String serialNumber = jsonRequest["serialNumber"];
