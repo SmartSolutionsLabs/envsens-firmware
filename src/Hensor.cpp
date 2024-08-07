@@ -362,10 +362,16 @@ float_t Hensor::getCO2Calibration(int index){
 }
 
 void Hensor::holdCO2Value(uint32_t value) {
+	if(value < 0){
+		value = 0;
+	}
 	this->currentDatagas.co2 = value;
 }
 
 void Hensor::holdNH3Value(uint32_t value) {
+	if(value < 0){
+		value = 0;
+	}
 	this->currentDatagas.nh3 = value;
 }
 
@@ -374,6 +380,12 @@ void Hensor::holdTemperatureValue(float_t value) {
 }
 
 void Hensor::holdHumidityValue(float_t value) {
+	if(value < 0){
+		value = 0;
+	}
+	else if(value > 100){
+		value = 100;
+	}
 	this->currentDatagas.humidity = value;
 }
 
