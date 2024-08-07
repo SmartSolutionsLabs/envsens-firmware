@@ -16,6 +16,8 @@ Network * Network::getInstance() {
 
 Network::Network() : server(80) {
 	WiFi.mode(WIFI_STA);
+	WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);
+  	WiFi.setHostname("EnvSens");
 
 	server.on("/", HTTP_GET, [](AsyncWebServerRequest * request) {
 		request->send(200, "text/plain", "This is the ESP HTTP server.");
@@ -74,6 +76,11 @@ void Network::onDisconnected(WiFiEvent_t event, WiFiEventInfo_t info) {
 		--Network::remainingAttempts;
 		WiFi.begin(Network::SSID, Network::PASSWORD);
 	}
+}
+
+void Network::setNetworkHostname(String newhostname){
+	WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE); 
+  	WiFi.setHostname(newhostname.c_str());
 }
 
 void Network::connect() {

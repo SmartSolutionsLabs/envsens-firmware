@@ -105,6 +105,7 @@ class Hensor {
 		// About HTTP endpoints
 		void setEndpointHostname(String hostname, bool persistent = true);
 		void setEndpointPost(String post, bool persistent = true);
+		void setNetworkHostname(String newHostName,  bool persistent = true);
 
 		// Initial parameters in boot
 		void setDeviceName(String name, bool persistent = true);

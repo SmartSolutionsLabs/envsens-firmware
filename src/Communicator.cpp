@@ -82,6 +82,7 @@ void Communicator::parseIncome(void * data) {
 			hensor->setDeviceName(name);
 			hensor->setDeviceSerialNumber(serialNumber);
 			hensor->setBluetoothName(bluetoothName);
+			hensor->setNetworkHostname(name);	
 			break;
 		}
 		case 1001: {

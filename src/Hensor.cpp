@@ -22,6 +22,7 @@ Hensor * Hensor::getInstance() {
 Hensor::Hensor() {
 	// Section for loading parameters
 	this->preferences.begin("hensor", false); // Namespace for everything
+	this->setNetworkHostname(this->preferences.getString("networkHostName", ""), false);
 	this->setEndpointHostname(this->preferences.getString("hostname", ""), false);
 	this->setEndpointPost(this->preferences.getString("post", ""), false);
 	this->setDeviceName(this->preferences.getString("name", ""), false);
@@ -101,6 +102,14 @@ void Hensor::setWifiCredentials(String &ssid, String &password) {
 
 	Network::PASSWORD = password;
 	this->preferences.putString("netPassword", password);
+}
+
+void Hensor::setNetworkHostname(String newNetworkHostName, bool persistent){
+	if (persistent) {
+		this->preferences.putString("networkHostName", newNetworkHostName);
+	}
+	String networkhostname = "Envsens " + newNetworkHostName;
+	Network::getInstance()->setNetworkHostname(networkhostname);
 }
 
 void Hensor::setEndpointHostname(String hostname, bool persistent) {
