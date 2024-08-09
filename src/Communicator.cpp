@@ -83,10 +83,14 @@ void Communicator::parseIncome(void * data) {
 			break;
 		}
 		case 1000: {
+			uint8_t type = jsonRequest["type"];
 			String name = jsonRequest["name"];
 			String serialNumber = jsonRequest["serialNumber"];
 			String bluetoothName = jsonRequest["bluetoothName"];
 
+			if (type) {
+				hensor->setType(type);
+			}
 			if (name) {
 				hensor->setDeviceName(name);
 				hensor->setNetworkHostname(name);
