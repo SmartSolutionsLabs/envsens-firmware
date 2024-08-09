@@ -31,7 +31,7 @@ Hensor::Hensor() {
 	this->setNetworkInterval(this->preferences.getUInt("interval", 2), false);
 	this->setLocalInterval(this->preferences.getUInt("intervalLocal", 2), false);
 	this->setCO2Calibration (this->preferences.getFloat("co2_a", 1.0f), this->preferences.getFloat("co2_b", 1.0f), false);
-	//(float_t nh3_m ,float_t nh3_n ,uint32_t nh3_R0 ,float_t nh3_maxV 
+	//(float_t nh3_m ,float_t nh3_n ,uint32_t nh3_R0 ,float_t nh3_maxV
 	this->setNH3Calibration  (this->preferences.getFloat("nh3_m", -1.800f), this->preferences.getFloat("nh3_n", -0.163f),
 							this->preferences.getUInt("nh3_R0", 98400),this->preferences.getFloat("nh3_maxV", 5.193f),
 							 false);
@@ -41,9 +41,7 @@ Hensor::Hensor() {
 	Network::SSID = this->preferences.getString("netSsid", "");
 	Network::PASSWORD = this->preferences.getString("netPassword", "");
 	// To decide if we must turn on WiFi
-	if(this->inProductionMode = this->preferences.getBool("inProduction", false) ) {
-		//Network::getInstance()->connect();
-	}
+	this->inProductionMode = this->preferences.getBool("inProduction", false);
 
 	// Only change pins because already started in master mode
 	Wire.setPins(5, 4);
@@ -263,7 +261,7 @@ float_t Hensor::FunctionTemperatureCalibrated(float_t mt){
 	//float_t T =  1.0315 * meassuredTemperature - 0.9325; // G-1
 	//float_t T = 1.0079 * meassuredTemperature + 0.4623; // G-3
 	//float_t  T = mt; // G-2
-	float_t  T = mt * this->calibration.t_a + this->calibration.t_b; 
+	float_t  T = mt * this->calibration.t_a + this->calibration.t_b;
 	return T;
 }
 
@@ -288,11 +286,11 @@ uint32_t Hensor::FunctionNH3Calibrated(float_t nh3){
 	//this->calibration.nh3_maxVoltage = 5.193;
 
 	float_t nh3_read_value = (nh3 * this->calibration.nh3_R0) / (this->calibration.nh3_maxV - nh3);
-	
+
 	// uint32_t nh3_in_ppm = pow(10, -1.8 * log(nh3_read_value/this->calibration.R0)/log(10) - 0.163);
 	uint32_t nh3_in_ppm = pow(10, this->calibration.nh3_m * log(nh3_read_value/this->calibration.nh3_R0)/log(10) + this->calibration.nh3_n);
 
-	return nh3_in_ppm;	
+	return nh3_in_ppm;
 }
 
 uint32_t Hensor::FunctionCO2Calibrated(float_t co2){
@@ -360,11 +358,11 @@ float_t Hensor::getNH3Calibration(int index){
 float_t Hensor::getCO2Calibration(int index){
 	float_t aux ;
 	if(index == 0){
-		aux = this->calibration.co2_a; 
+		aux = this->calibration.co2_a;
 		return aux;
 	}
 	if(index == 1){
-		aux = this->calibration.co2_b; 
+		aux = this->calibration.co2_b;
 		return aux;
 	}
 	return 0;
@@ -535,6 +533,6 @@ void Hensor::assemblySensorsStatus(std::string &jsonString) {
 	jsonResponse["data"][i]["s_type"] = 5;
 	jsonResponse["data"][i]["ssid"] = Network::SSID;
 	jsonResponse["data"][i]["ip"] = "";
-	
+
 	serializeJson(jsonResponse, jsonString);
 }
