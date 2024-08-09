@@ -17,12 +17,11 @@ void NH3sensor::connect(void * data) {
 }
 
 void NH3sensor::run(void* data) {
-	if (!this->connectedStatus) {
-		Serial.print("NH3 sensor unable to connect\n");
-		esp_restart();
-	}
-
 	Hensor * hensor = Hensor::getInstance();
+
+	if (hensor->isProductionMode()) {
+		this->testReset();
+	}
 
 	int16_t iterationsMeassure = 3;
 	while (1) {

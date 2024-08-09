@@ -16,12 +16,11 @@ void Multisensor::connect(void * data) {
 }
 
 void Multisensor::run(void* data) {
-	if (!this->connectedStatus) {
-		Serial.print("Multisensor unable to connect\n");
-		esp_restart();
-	}
-
 	Hensor * hensor = Hensor::getInstance();
+
+	if (hensor->isProductionMode()) {
+		this->testReset();
+	}
 
 	while (1) {
 		vTaskDelay(this->iterationDelay);

@@ -16,14 +16,13 @@ void CO2sensor::connect(void * data) {
 }
 
 void CO2sensor::run(void* data) {
-	if (!this->connectedStatus) {
-		Serial.print("CO2 sensor unable to connect\n");
-		esp_restart();
-	}
-
 	this->iterationDelay = 5000 / portTICK_PERIOD_MS;
 
 	Hensor * hensor = Hensor::getInstance();
+
+	if (hensor->isProductionMode()) {
+		this->testReset();
+	}
 
 	while (1) {
 		vTaskDelay(this->iterationDelay);
