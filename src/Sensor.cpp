@@ -9,7 +9,8 @@ bool Sensor::isConnected() const {
 
 void Sensor::testReset() const {
 	if (!this->connectedStatus) {
-		Serial.print("Multisensor unable to connect\n");
+		Serial.print(this->name);
+		Serial.print(" sensor unable to connect\n");
 		esp_restart();
 	}
 }
