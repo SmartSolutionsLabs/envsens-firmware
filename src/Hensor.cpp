@@ -47,11 +47,13 @@ Hensor::Hensor() {
 	// Only change pins because already started in master mode
 	Wire.setPins(5, 4);
 
+	if (this->type == NODE_MASTER_TYPE) {
+		this->sensors[SENSOR_CO2_INDEX] = new CO2sensor("co2");
+		this->sensors[SENSOR_CO2_INDEX]->connect(&Wire);
+	}
+
 	this->sensors[SENSOR_MULTI_INDEX] = new Multisensor("multi");
 	this->sensors[SENSOR_MULTI_INDEX]->connect(&Wire);
-
-	this->sensors[SENSOR_CO2_INDEX] = new CO2sensor("co2");
-	this->sensors[SENSOR_CO2_INDEX]->connect(&Wire);
 
 	this->sensors[SENSOR_NH3_INDEX] = new NH3sensor("nh3");
 	this->sensors[SENSOR_NH3_INDEX]->connect(&Wire);
