@@ -275,6 +275,9 @@ void Communicator::run(void * data) {
 			hensor->setSendingOut(false);
 		}
 	}
+
+	// Reset because there is a bug
+	esp_restart();
 }
 
 void Communicator::setEndpointHostname(String newHostname) {
