@@ -301,6 +301,7 @@ void Communicator::run(void * data) {
 	}
 
 	// Reset because there is a bug
+	Serial.print("Task Communicator ended!\n");
 	esp_restart();
 }
 
