@@ -5,8 +5,9 @@
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 //#include <ElegantOTA.h>
-#include <Arduino_ESP32_OTA.h>
+//#include <Arduino_ESP32_OTA.h>
 #include "root_ca.hpp"
+#include <esp32fota.h>
 
 static char const OTA_FILE_LOCATION[] = "https://raw.githubusercontent.com/arduino-libraries/Arduino_ESP32_OTA/main/examples/LOLIN_32_Blink/LOLIN_32_Blink.ino.ota";
 
@@ -14,13 +15,13 @@ static char const OTA_FILE_LOCATION[] = "https://raw.githubusercontent.com/ardui
 #define MAX_ATTEMPTS_QUANTITY 4
 #endif
 
-#define JSON_URL   "https://example.com/myimages/Further-OTA-Examples.json" // this is where you'll post your JSON filter file
-#define VERSION    "1.0.0" // The current version of this program
+#define VERSION "0.0.1" // The current version of this program
 
 class Network {
 	private:
 		const char* MyHostName;
-
+		esp32FOTA esp32FOTA("esp32-fota-http", 1, false);
+		const char* manifest_url = "https://raw.githubusercontent.com/SmartSolutionsLabs/envsens-firmware/main/manifestUpdate.json";
 	protected:
 		static Network * network;
 		Network();
