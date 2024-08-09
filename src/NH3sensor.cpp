@@ -10,12 +10,16 @@ NH3sensor::NH3sensor(const char * name, int taskCore) : Sensor(name, taskCore) {
 void NH3sensor::connect(void * data) {
 	this->sensor = new Adafruit_ADS1115();
 
-	this->connectedStatus = this->sensor->begin(ADS1X15_ADDRESS, static_cast<TwoWire*>(data));
+	while (--this->remainingAttempts && !this->connectedStatus) {
+		this->connectedStatus = this->sensor->begin(ADS1X15_ADDRESS, static_cast<TwoWire*>(data));
+		vTaskDelay(50 / portTICK_PERIOD_MS);
+	}
 }
 
 void NH3sensor::run(void* data) {
-	if( !this->connectedStatus ) {
-		this->stop();
+	if (!this->connectedStatus) {
+		Serial.print("NH3 sensor unable to connect\n");
+		esp_restart();
 	}
 
 	Hensor * hensor = Hensor::getInstance();
@@ -27,7 +31,7 @@ void NH3sensor::run(void* data) {
 			channelData = this->sensor->readADC_SingleEnded(0);
 			voltage += this->sensor->computeVolts(this->channelData);
 			continue;
-		} 
+		}
 		iterationsMeassure = 3;
 		voltage = voltage / 3;
 		ESP_LOGI(HENSOR_TAG, "Channel data: %d", this->channelData);

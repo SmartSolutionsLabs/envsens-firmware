@@ -9,12 +9,16 @@ CO2sensor::CO2sensor(const char * name, int taskCore) : Sensor(name, taskCore) {
 void CO2sensor::connect(void * data) {
 	this->sensor = new SCD4x();
 
-	this->connectedStatus = this->sensor->begin(static_cast<TwoWire*>(data));
+	while (--this->remainingAttempts && !this->connectedStatus) {
+		this->connectedStatus = this->sensor->begin(static_cast<TwoWire*>(data));
+		vTaskDelay(50 / portTICK_PERIOD_MS);
+	}
 }
 
 void CO2sensor::run(void* data) {
-	if( !this->connectedStatus ) {
-		this->stop();
+	if (!this->connectedStatus) {
+		Serial.print("CO2 sensor unable to connect\n");
+		esp_restart();
 	}
 
 	this->iterationDelay = 5000 / portTICK_PERIOD_MS;
