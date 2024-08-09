@@ -41,7 +41,7 @@ Hensor::Hensor() {
 	Network::SSID = this->preferences.getString("netSsid", "");
 	Network::PASSWORD = this->preferences.getString("netPassword", "");
 	// To decide if we must turn on WiFi
-	if( this->inProductionMode = this->preferences.getBool("inProduction", false) ) {
+	if(this->inProductionMode = this->preferences.getBool("inProduction", false) ) {
 		//Network::getInstance()->connect();
 	}
 

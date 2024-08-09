@@ -179,7 +179,7 @@ void Communicator::sendOut() {
 	// Catch here so more accurate
 	Datagas currentDatagas = Hensor::getInstance()->getCurrentDatagas();
 	if(WiFi.status() != WL_CONNECTED){
-		Network::getInstance()->connect();
+		
 	}
 	
 	WiFiClientSecure httpClient;

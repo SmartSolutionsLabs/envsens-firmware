@@ -72,9 +72,12 @@ void Network::onDisconnected(WiFiEvent_t event, WiFiEventInfo_t info) {
 	}
 
 	// Reattempt the connection
-	if(Network::remainingAttempts > 0) {
-		--Network::remainingAttempts;
-		WiFi.begin(Network::SSID, Network::PASSWORD);
+	if(WiFi.status() != WL_CONNECTED){
+		if(Network::remainingAttempts > 0) {
+			--Network::remainingAttempts;
+			WiFi.reconnect();
+			//WiFi.begin(Network::SSID, Network::PASSWORD);
+		}
 	}
 }
 
@@ -95,3 +98,4 @@ void Network::connect() {
 	// Attempt the connection
 	WiFi.begin(Network::SSID, Network::PASSWORD);
 }
+	

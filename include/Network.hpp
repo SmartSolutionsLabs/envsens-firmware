@@ -12,7 +12,7 @@
 
 class Network {
 	private:
-		const char* MyHostName = "Galatea G-3";
+		const char* MyHostName;
 	protected:
 		static Network * network;
 		Network();
