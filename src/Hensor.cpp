@@ -22,6 +22,7 @@ Hensor * Hensor::getInstance() {
 Hensor::Hensor() {
 	// Section for loading parameters
 	this->preferences.begin("hensor", false); // Namespace for everything
+	this->setType(this->preferences.getUChar("nodeType", NODE_HELPER_TYPE), false);
 	this->setNetworkHostname(this->preferences.getString("networkHostName", ""), false);
 	this->setEndpointHostname(this->preferences.getString("hostname", ""), false);
 	this->setEndpointPost(this->preferences.getString("post", ""), false);
@@ -126,6 +127,18 @@ void Hensor::setEndpointPost(String post, bool persistent) {
 
 	// Pass it directly to the communicator
 	Communicator::getInstance()->setEndpointPost(post);
+}
+
+void Hensor::setType(uint8_t type, bool persistent) {
+	if (persistent) {
+		this->preferences.putUChar("nodeType", type);
+	}
+
+	this->type = type;
+}
+
+uint8_t Hensor::getType() const {
+	return this->type;
 }
 
 void Hensor::setDeviceName(String name, bool persistent) {

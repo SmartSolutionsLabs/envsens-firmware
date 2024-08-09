@@ -7,6 +7,9 @@
 #define SENSOR_NH3_INDEX 1
 #define SENSOR_CO2_INDEX 2
 
+#define NODE_MASTER_TYPE 0
+#define NODE_HELPER_TYPE 1
+
 #include <Arduino.h>
 #include <Preferences.h>
 #include <RTClib.h>
@@ -62,6 +65,9 @@ class Hensor {
 		String deviceSerialNumber;
 
 		String deviceBluetoothName;
+
+		uint8_t type;
+
 		/**
 		 * To decide turning WiFi for production or BLE to configuration.
 		 */
@@ -110,7 +116,8 @@ class Hensor {
 		// Initial parameters in boot
 		void setDeviceName(String name, bool persistent = true);
 		String getDeviceName() const;
-
+		void setType(uint8_t type, bool persistent = true);
+		uint8_t getType() const;
 		void setDeviceSerialNumber(String serialNumber, bool persistent = true);
 		String getDeviceSerialNumber() const;
 		void setBluetoothName(String bluetoothName, bool persistent = true);
