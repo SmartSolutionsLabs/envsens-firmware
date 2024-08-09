@@ -24,7 +24,7 @@ Network::Network() : server(80) {
 	});
 
 	// Start AsyncElegantOTA
-	ElegantOTA.begin(&server);
+	/*ElegantOTA.begin(&server);
 	ElegantOTA.setAutoReboot(true);
 	ElegantOTA.onStart([]() {
 		Serial.print("OTA update started!\n");
@@ -41,7 +41,7 @@ Network::Network() : server(80) {
 			// Add failure handling here.
 		}
 	});
-
+		*/
 	server.begin();
 
 	// Delete old configuration
@@ -98,4 +98,49 @@ void Network::connect() {
 	// Attempt the connection
 	WiFi.begin(Network::SSID, Network::PASSWORD);
 }
-	
+
+void Network::checkNewFirmware(){
+	Arduino_ESP32_OTA ota;
+	Arduino_ESP32_OTA::Error ota_err = Arduino_ESP32_OTA::Error::None;
+
+	/* Configure custom Root CA */
+	ota.setCACert(root_ca);
+
+	Serial.println("Initializing OTA storage");
+	if ((ota_err = ota.begin()) != Arduino_ESP32_OTA::Error::None)
+	{
+		Serial.print  ("Arduino_ESP_OTA::begin() failed with error code ");
+		Serial.println((int)ota_err);
+		return;
+	}
+
+
+	Serial.println("Starting download to flash ...");
+	int const ota_download = ota.download(OTA_FILE_LOCATION);
+	if (ota_download <= 0)
+	{
+		Serial.print  ("Arduino_ESP_OTA::download failed with error code ");
+		Serial.println(ota_download);
+		return;
+	}
+	Serial.print  (ota_download);
+	Serial.println(" bytes stored.");
+
+
+	Serial.println("Verify update integrity and apply ...");
+	if ((ota_err = ota.update()) != Arduino_ESP32_OTA::Error::None)
+	{
+		Serial.print  ("ota.update() failed with error code ");
+		Serial.println((int)ota_err);
+		return;
+	}
+
+	Serial.println("Performing a reset after which the bootloader will start the new firmware.");
+	#if defined(ARDUINO_NANO_ESP32)
+	Serial.println("Hint: Arduino NANO ESP32 will blink Red Green and Blue.");
+	#else
+	Serial.println("Hint: LOLIN32 will blink Blue.");
+	#endif
+	delay(1000); /* Make sure the serial message gets out before the reset. */
+	ota.reset();
+}
