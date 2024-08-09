@@ -9,15 +9,19 @@ CO2sensor::CO2sensor(const char * name, int taskCore) : Sensor(name, taskCore) {
 void CO2sensor::connect(void * data) {
 	this->sensor = new SCD4x();
 
-	this->connectedStatus = this->sensor->begin(static_cast<TwoWire*>(data));
+	while (--this->remainingAttempts && !this->connectedStatus) {
+		this->connectedStatus = this->sensor->begin(static_cast<TwoWire*>(data));
+		vTaskDelay(50 / portTICK_PERIOD_MS);
+	}
 }
 
 void CO2sensor::run(void* data) {
-	if( !this->connectedStatus ) {
-		this->stop();
+	if (!this->connectedStatus) {
+		Serial.print("CO2 sensor unable to connect\n");
+		esp_restart();
 	}
 
-	this->iterationDelay = 15000 / portTICK_PERIOD_MS;
+	this->iterationDelay = 5000 / portTICK_PERIOD_MS;
 
 	Hensor * hensor = Hensor::getInstance();
 
@@ -29,10 +33,10 @@ void CO2sensor::run(void* data) {
 			continue;
 		}
 
-		ESP_LOGI(HENSOR_TAG, "Temperature(C): %.2f", this->sensor->getTemperature());
-		ESP_LOGI(HENSOR_TAG, "CO2(ppm): %d", this->sensor->getCO2());
+		ESP_LOGI(HENSOR_TAG, "Temperature CO2 (C): %.2f", this->sensor->getTemperature());
+		ESP_LOGI(HENSOR_TAG, "CO2(ppm): %d", hensor->FunctionCO2Calibrated(this->sensor->getCO2()));
 
-		hensor->holdCO2Value(this->sensor->getCO2() * hensor->getCO2Multiplier());
+		hensor->holdCO2Value(hensor->FunctionCO2Calibrated(this->sensor->getCO2()));
 	}
 
 	this->stop();

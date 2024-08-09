@@ -1,5 +1,29 @@
-EQUIPO 2:{
+EQUIPO 3:{
     SERIE = 989907888616; 
     V_MAX = 5.193v;
     R0_NH3 = 98800;
+    T = 0.848 *  meassuredTemperature - 5.9688;
+    H = 0.00623 * mh * mh * mh - 0.52882 * mh * mh + 15.18842 * mh - 86.82952;
 } 
+EQUIPO 2:{
+    SERIE = 989907888588; 
+    V_MAX = 5.115v;
+    R0_NH3 = 98700;
+    T = 1.10493 *  meassuredTemperature - 16.30762;
+    H = 0.00533 * mh * mh * mh - 0.42805 * mh * mh + 11.90744 * mh - 51.83372;
+} 
+EQUIPO 1:{
+    SERIE = 989907888601; 
+    V_MAX = 5.069v;
+    R0_NH3 = 98400;
+    CO2= OK;
+    T = 1.0588 * meassuredTemperature - 14.728;
+    T - 2.4488 / 0.9757= 
+    H = 0.0073 * mh * mh * mh - 0,7689 * mh * mh - 272.2;
+} 
+
+
+temperature{
+    G2 = 1.0174 * G1 - 1.22;
+    G2 = 0.9868 * G3 - 0.4349;
+}

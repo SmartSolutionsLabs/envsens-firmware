@@ -10,24 +10,16 @@ NH3sensor::NH3sensor(const char * name, int taskCore) : Sensor(name, taskCore) {
 void NH3sensor::connect(void * data) {
 	this->sensor = new Adafruit_ADS1115();
 
-	this->connectedStatus = this->sensor->begin(ADS1X15_ADDRESS, static_cast<TwoWire*>(data));
-}
-
-uint32_t  NH3sensor::getPPM(float voltage){
-	this->R0 = 98800;
-	this->maxVoltage = 5.193;
-	this->RS = (R0*voltage)/(maxVoltage - voltage);
-	this->nh3_read_value = (voltage * this->R0) / (maxVoltage - voltage);
-	this->SR = 5;
-	this->nh3_in_ppm = 0;
-	
-	this->nh3_in_ppm = pow(10, -1.8 * log(nh3_read_value/R0)/log(10) - 0.163);
-	return this->nh3_in_ppm;
+	while (--this->remainingAttempts && !this->connectedStatus) {
+		this->connectedStatus = this->sensor->begin(ADS1X15_ADDRESS, static_cast<TwoWire*>(data));
+		vTaskDelay(50 / portTICK_PERIOD_MS);
+	}
 }
 
 void NH3sensor::run(void* data) {
-	if( !this->connectedStatus ) {
-		this->stop();
+	if (!this->connectedStatus) {
+		Serial.print("NH3 sensor unable to connect\n");
+		esp_restart();
 	}
 
 	Hensor * hensor = Hensor::getInstance();
@@ -39,14 +31,14 @@ void NH3sensor::run(void* data) {
 			channelData = this->sensor->readADC_SingleEnded(0);
 			voltage += this->sensor->computeVolts(this->channelData);
 			continue;
-		} 
+		}
 		iterationsMeassure = 3;
 		voltage = voltage / 3;
 		ESP_LOGI(HENSOR_TAG, "Channel data: %d", this->channelData);
 		ESP_LOGI(HENSOR_TAG, "Voltage: %.2f", this->voltage);
-		ESP_LOGI(HENSOR_TAG, "NH3-PPM: %d", this->getPPM(this->voltage));
+		ESP_LOGI(HENSOR_TAG, "NH3-PPM: %d", hensor->FunctionCO2Calibrated(this->voltage));
 
-		hensor->holdNH3Value(this->getPPM(this->voltage) * hensor->getNH3Multiplier());
+		hensor->holdNH3Value(hensor->FunctionCO2Calibrated(this->voltage));
 		voltage = 0;
 	}
 

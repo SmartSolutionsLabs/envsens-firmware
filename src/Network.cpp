@@ -16,6 +16,8 @@ Network * Network::getInstance() {
 
 Network::Network() : server(80) {
 	WiFi.mode(WIFI_STA);
+	WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);
+  	WiFi.setHostname("EnvSens");
 
 	server.on("/", HTTP_GET, [](AsyncWebServerRequest * request) {
 		request->send(200, "text/plain", "This is the ESP HTTP server.");
@@ -48,6 +50,14 @@ Network::Network() : server(80) {
 	WiFi.onEvent(onConnected, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_CONNECTED);
 	WiFi.onEvent(onAddressed, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_GOT_IP);
 	WiFi.onEvent(onDisconnected, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_DISCONNECTED);
+
+	WiFi.onEvent(onDisconnected, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_DISCONNECTED);
+	WiFi.onEvent(
+		[](WiFiEvent_t event, WiFiEventInfo_t info) {
+			Serial.print("WiFi lost IP\n");
+		},
+		WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_LOST_IP
+	);
 }
 
 void Network::onConnected(WiFiEvent_t event, WiFiEventInfo_t info) {
@@ -70,10 +80,12 @@ void Network::onDisconnected(WiFiEvent_t event, WiFiEventInfo_t info) {
 	}
 
 	// Reattempt the connection
-	if(Network::remainingAttempts > 0) {
-		--Network::remainingAttempts;
-		WiFi.begin(Network::SSID, Network::PASSWORD);
-	}
+	WiFi.reconnect();
+}
+
+void Network::setNetworkHostname(String newhostname){
+	WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);
+  	WiFi.setHostname(newhostname.c_str());
 }
 
 void Network::connect() {

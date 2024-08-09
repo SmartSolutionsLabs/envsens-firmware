@@ -1,9 +1,9 @@
 #include "Communicator.hpp"
 #include "Hensor.hpp"
-
 #include <ArduinoJson.h>
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
+#include "Network.hpp"
 
 static const char * HENSOR_TAG = "Hensor";
 
@@ -33,15 +33,14 @@ void Communicator::parseIncome(void * data) {
 	jsonResponse["success"] = true;
 	switch(cmd) {
 		case 0: {
-            jsonResponse["nro_serie"] = "989907888588";
-    		jsonResponse["tipo_modelo"] = 1;
+			jsonResponse["nro_serie"] = hensor->getDeviceSerialNumber();
+			jsonResponse["tipo_modelo"] = hensor->getType();
 			Serial.println("case 0 , asked");
-            break;
+			break;
 		}
-        case 1: {
+		case 1: {
 			jsonResponse["version"] = 1.0f;
 			jsonResponse["relays"] = 1;
-			Serial.println("case 1 , asked");
 			break;
 		}
 		case 2: {
@@ -56,7 +55,9 @@ void Communicator::parseIncome(void * data) {
 				JsonArray hoursArray = scheduleArray.add<JsonArray>();
 				copyArray(schedule, hoursArray);
 			}
-			Serial.println("case 2 , asked");
+			break;
+		}
+		case 6: {
 			break;
 		}
 		case 7: {
@@ -68,56 +69,94 @@ void Communicator::parseIncome(void * data) {
 			break;
 		}
 		case 9: {
-			String dateTime(jsonRequest["time"].as<String>());
+			String dateTime = jsonRequest["time"];
 
-			hensor->setTime(dateTime);
+			if (dateTime) {
+				hensor->setTime(dateTime);
+			}
 
 			break;
 		}
+		case 10:{
+			hensor->setProductionMode( !hensor->isProductionMode() ); // toggle
+			esp_restart(); // Everything is ended
+			break;
+		}
 		case 1000: {
+			uint8_t type = jsonRequest["type"];
 			String name = jsonRequest["name"];
+			String serialNumber = jsonRequest["serialNumber"];
+			String bluetoothName = jsonRequest["bluetoothName"];
 
-			hensor->setDeviceName(name);
-
+			if (type) {
+				hensor->setType(type);
+			}
+			if (name) {
+				hensor->setDeviceName(name);
+				hensor->setNetworkHostname(name);
+			}
+			if (serialNumber) {
+				hensor->setDeviceSerialNumber(serialNumber);
+			}
+			if (bluetoothName) {
+				hensor->setBluetoothName(bluetoothName);
+			}
 			break;
 		}
 		case 1001: {
 			String hostname = jsonRequest["host"];
 			String post = jsonRequest["post"];
 
-			hensor->setEndpointHostname(hostname);
-			hensor->setEndpointPost(post);
+			if (hostname) {
+				hensor->setEndpointHostname(hostname);
+			}
+			if (post) {
+				hensor->setEndpointPost(post);
+			}
 
 			break;
 		}
 		case 1002: {
-			uint32_t interval = jsonRequest["lap"];
+			uint32_t interval = jsonRequest["lap-wifi"];
+			uint32_t localInterval = jsonRequest["lap-ble"];
 
-			hensor->setNetworkInterval(interval);
+			if (interval) {
+				hensor->setNetworkInterval(interval);
+			}
+			if (localInterval) {
+				hensor->setLocalInterval(localInterval);
+			}
 
 			break;
 		}
 		case 1003: {
-			uint32_t kCO2 = jsonRequest["co2"];
-			float_t kNH3 = jsonRequest["nh3"];
-			float_t kTemperature = jsonRequest["t"];
-			uint32_t kHumidity = jsonRequest["humidity"];
-			uint32_t kPressure = jsonRequest["pressure"];
+			float_t CO2_a = jsonRequest["CO2_a"];
+			float_t CO2_b = jsonRequest["CO2_b"];
+			float_t NH3_m = jsonRequest["NH3_m"];
+			float_t NH3_n = jsonRequest["NH3_n"];
+			uint32_t NH3_R0 = jsonRequest["NH3_R0"];
+			float_t NH3_maxV= jsonRequest["NH3_maxV"];
+			float_t T_a = jsonRequest["T_a"];
+			float_t T_b = jsonRequest["T_b"];
+			float_t H_a = jsonRequest["H_a"];
+			float_t H_b = jsonRequest["H_b"];
+			float_t P_a = jsonRequest["P_a"];
+			float_t P_b = jsonRequest["P_b"];
 
-			if (kCO2) {
-				hensor->setCO2Multiplier(kCO2);
+			if (CO2_a) {
+				hensor->setCO2Calibration(CO2_a, CO2_b, true);
 			}
-			if (kNH3) {
-				hensor->setNH3Multiplier(kNH3);
+			if (NH3_m) {
+				hensor->setNH3Calibration(NH3_m, NH3_n, NH3_R0, NH3_maxV, true);
 			}
-			if (kTemperature) {
-				hensor->setTemperatureMultiplier(kTemperature);
+			if (T_a) {
+				hensor->setTemperatureCalibration(T_a, T_b, true);
 			}
-			if (kHumidity) {
-				hensor->setHumidityMultiplier(kHumidity);
+			if (H_a) {
+				hensor->setHumidityCalibration(H_a, H_b, true);
 			}
-			if (kPressure) {
-				hensor->setPressureMultiplier(kPressure);
+			if (P_a) {
+				hensor->setPressureCalibration(P_a, P_b, true);
 			}
 
 			break;
@@ -127,18 +166,27 @@ void Communicator::parseIncome(void * data) {
 			hensor->getWifiCredentials(wifiSsid, wifiPass);
 			DateTime now = hensor->getRtcNow();
 			jsonResponse["name"] = hensor->getDeviceName();
+			jsonResponse["type"] = hensor->getType();
+			jsonResponse["serialNumber"] = hensor->getDeviceSerialNumber();
 			jsonResponse["interval"] = this->networkInterval;
 			jsonResponse["time"] = now.timestamp(DateTime::TIMESTAMP_FULL);
 			jsonResponse["wifi"]["ssid"] = wifiSsid;
 			jsonResponse["wifi"]["pass"] = wifiPass;
 			jsonResponse["endpoint"]["host"] = this->endpoint.hostname;
 			jsonResponse["endpoint"]["post"] = this->endpoint.post;
-			jsonResponse["k"]["co2"] = hensor->getCO2Multiplier();
-			jsonResponse["k"]["nh3"] = hensor->getNH3Multiplier();
-			jsonResponse["k"]["t"] = hensor->getTemperatureMultiplier();
-			jsonResponse["k"]["humidity"] = hensor->getHumidityMultiplier();
-			jsonResponse["k"]["pressure"] = hensor->getPressureMultiplier();
 
+			jsonResponse["CO2_a"] = hensor->getCO2Calibration(0);
+			jsonResponse["CO2_b"] = hensor->getCO2Calibration(1);
+			jsonResponse["NH3_m"] =    hensor->getNH3Calibration(0);
+			jsonResponse["NH3_n"] =    hensor->getNH3Calibration(1);
+			jsonResponse["NH3_R0"] =   hensor->getNH3Calibration(2);
+			jsonResponse["NH3_maxV"] = hensor->getNH3Calibration(3);
+			jsonResponse["T_a"] = hensor->getTemperatureCalibration(0);
+			jsonResponse["T_b"] = hensor->getTemperatureCalibration(1);
+			jsonResponse["H_a"] = hensor->getHumidityCalibration(0);
+			jsonResponse["H_b"] = hensor->getHumidityCalibration(1);
+			jsonResponse["P_a"] = hensor->getPressureCalibration(0);
+			jsonResponse["P_b"] = hensor->getPressureCalibration(1);
 			break;
 		}
 		default:
@@ -151,26 +199,34 @@ void Communicator::parseIncome(void * data) {
 	Ble::bleCallback->writeLargeText(Ble::resCharacteristic, answer);
 }
 
-inline void Communicator::sendOut() {
+void Communicator::sendOut() {
+	// Catch here so more accurate
+	Datagas currentDatagas = Hensor::getInstance()->getCurrentDatagas();
+	if(WiFi.status() != WL_CONNECTED){
+	}
+
 	WiFiClientSecure httpClient;
 	httpClient.setInsecure();
-
 	if (!httpClient.connect(this->endpoint.hostname.c_str(), 443)) {
 		Serial.print("Failed connection to ");
 		Serial.println(this->endpoint.hostname);
 		return;
 	}
 	else {
-		Datagas currentDatagas = Hensor::getInstance()->getCurrentDatagas();
+		// Process datagas catched at start
 		DateTime dateTime(currentDatagas.unixtime);
 		JsonDocument jsonResponse;
-		jsonResponse["Equipo"] = Hensor::getInstance()->getDeviceName();
-		jsonResponse["FechaHora"] = dateTime.timestamp(DateTime::TIMESTAMP_DATE) + " " + dateTime.timestamp(DateTime::TIMESTAMP_TIME);
-		jsonResponse["CO2"] = currentDatagas.co2;
-		jsonResponse["NH3"] = currentDatagas.nh3;
-		jsonResponse["Temp"] = currentDatagas.temperature;
-		jsonResponse["HR"] = currentDatagas.humidity;
-		jsonResponse["PR"] = currentDatagas.pressure;
+		jsonResponse["equipo"] = Hensor::getInstance()->getDeviceName();
+		jsonResponse["fechahora"] = dateTime.timestamp(DateTime::TIMESTAMP_DATE) + " " + dateTime.timestamp(DateTime::TIMESTAMP_TIME);
+		jsonResponse["co2"] = currentDatagas.co2;
+		jsonResponse["nh3"] = currentDatagas.nh3;
+		jsonResponse["temp"] = currentDatagas.temperature;
+		jsonResponse["hr"] = currentDatagas.humidity;
+		jsonResponse["pr"] = currentDatagas.pressure;
+		float readed_battery = analogRead(15)*3.30/4096;
+		if(readed_battery > 3.10 ) readed_battery = 3.10;
+		float percentage = (readed_battery - 2.00)*100/1.1;
+		jsonResponse["pila"] = percentage ;
 		String body;
 		serializeJson(jsonResponse, body);
 
@@ -206,11 +262,12 @@ void Communicator::addInstruction(String instruction) {
 }
 
 void Communicator::run(void * data) {
-	static int checkedMinute = 0;
-	static int currentMinute;
 	static TickType_t delay = 1 / portTICK_PERIOD_MS;
 	static Hensor * hensor = Hensor::getInstance();
 	static int sendingInterval = hensor->isProductionMode() ? this->networkInterval : this->localInterval;
+
+	// A little delay
+	vTaskDelay(1000 / portTICK_PERIOD_MS);
 
 	this->iterationDelay = 10 / portTICK_PERIOD_MS;
 
@@ -224,41 +281,27 @@ void Communicator::run(void * data) {
 			this->parseIncome(&instruction);
 		}
 
-		// Check what time is it because we must send data no matter what mode
-		DateTime now = hensor->getRtcNow();
-
-		// To do it with seconds for BLE or minutes for WiFi
-		if (hensor->isProductionMode()) {
-			currentMinute = now.minute();
-		}
-		else {
-			currentMinute = now.second();
-		}
-
-		// Do nothing if we did it before
-		if (checkedMinute == currentMinute) {
+		if (hensor->hasSentOnTime(sendingInterval)) {
 			continue;
 		}
-
-		if (currentMinute % sendingInterval != 0) {
-			continue;
-		}
-
-		// At passing must change it
-		checkedMinute = currentMinute;
 
 		if( !hensor->isProductionMode() ) {
 			std::string jsonString;
 			hensor->assemblySensorsStatus(jsonString);
 			Ble::bleCallback->writeLargeText(Ble::statusCharacteristic, jsonString);
 		}
-		// If the endpoint is empty we can't send anything
-		else if (hensor->isProductionMode() && !hensor->isSendingOut() && this->endpoint.hostname.length() && WiFi.status() == WL_CONNECTED) {
+		// Here is for production mode
+		// if the endpoint is empty we can't send anything
+		// if there is WiFi connection
+		else if (!hensor->isSendingOut() && this->endpoint.hostname.length() && WiFi.status() == WL_CONNECTED) {
 			hensor->setSendingOut(true);
 			this->sendOut();
 			hensor->setSendingOut(false);
 		}
 	}
+
+	// Reset because there is a bug
+	esp_restart();
 }
 
 void Communicator::setEndpointHostname(String newHostname) {

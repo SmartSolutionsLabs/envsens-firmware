@@ -10,6 +10,8 @@ class Sensor : public Thread {
 	protected:
 		bool connectedStatus;
 
+		unsigned int remainingAttempts = 4;
+
 	public:
 		Sensor(const char * name, int taskCore = 0);
 

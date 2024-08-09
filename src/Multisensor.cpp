@@ -9,12 +9,16 @@ Multisensor::Multisensor(const char * name, int taskCore) : Sensor(name, taskCor
 void Multisensor::connect(void * data) {
 	this->sensor = new Adafruit_BME680(static_cast<TwoWire*>(data));
 
-	this->connectedStatus = this->sensor->begin();
+	while (--this->remainingAttempts && !this->connectedStatus) {
+		this->connectedStatus = this->sensor->begin();
+		vTaskDelay(50 / portTICK_PERIOD_MS);
+	}
 }
 
 void Multisensor::run(void* data) {
-	if( !this->connectedStatus ) {
-		this->stop();
+	if (!this->connectedStatus) {
+		Serial.print("Multisensor unable to connect\n");
+		esp_restart();
 	}
 
 	Hensor * hensor = Hensor::getInstance();
@@ -27,11 +31,17 @@ void Multisensor::run(void* data) {
 			continue;
 		}
 
-		ESP_LOGI(HENSOR_TAG, "Temperature(C): %.2f", this->sensor->temperature);
+		ESP_LOGI(HENSOR_TAG, "Temperature(C): %.2f", hensor->FunctionTemperatureCalibrated(this->sensor->temperature));
+		ESP_LOGI(HENSOR_TAG, "Humidity(C): %.2f", hensor->FunctionHumidityCalibrated(this->sensor->humidity));
+		ESP_LOGI(HENSOR_TAG, "Pressure(C): %.2f", hensor->FunctionPressureCalibrated(this->sensor->pressure));
 
-		hensor->holdTemperatureValue(this->sensor->temperature * hensor->getTemperatureMultiplier());
-		hensor->holdHumidityValue(this->sensor->humidity * hensor->getHumidityMultiplier());
-		hensor->holdPressureValue(this->sensor->pressure * hensor->getPressureMultiplier());
+		hensor->holdTemperatureValue(hensor->FunctionTemperatureCalibrated(this->sensor->temperature));
+		//hensor->holdTemperatureValue(this->sensor->temperature);
+
+		//hensor->holdHumidityValue(hensor->FunctionHumidityCalibrated(this->sensor->humidity));
+		hensor->holdHumidityValue(hensor->FunctionHumidityCalibrated(this->sensor->humidity));
+
+		hensor->holdPressureValue(hensor->FunctionPressureCalibrated(this->sensor->pressure));
 	}
 
 	this->stop();

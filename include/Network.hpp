@@ -12,6 +12,7 @@
 
 class Network {
 	private:
+		const char* MyHostName;
 	protected:
 		static Network * network;
 		Network();
@@ -31,6 +32,7 @@ class Network {
 
 		static void onDisconnected(WiFiEvent_t event, WiFiEventInfo_t info);
 
+		void setNetworkHostname(String hostname);
 		/**
 		 * Call it when change the credentials.
 		 */
