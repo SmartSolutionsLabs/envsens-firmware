@@ -72,17 +72,11 @@ void Network::onDisconnected(WiFiEvent_t event, WiFiEventInfo_t info) {
 	}
 
 	// Reattempt the connection
-	if(WiFi.status() != WL_CONNECTED){
-		if(Network::remainingAttempts > 0) {
-			--Network::remainingAttempts;
-			WiFi.reconnect();
-			//WiFi.begin(Network::SSID, Network::PASSWORD);
-		}
-	}
+	WiFi.reconnect();
 }
 
 void Network::setNetworkHostname(String newhostname){
-	WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE); 
+	WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);
   	WiFi.setHostname(newhostname.c_str());
 }
 
@@ -98,4 +92,3 @@ void Network::connect() {
 	// Attempt the connection
 	WiFi.begin(Network::SSID, Network::PASSWORD);
 }
-	
