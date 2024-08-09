@@ -25,8 +25,6 @@ void setup() {
 	hensor->getSensor(SENSOR_CO2_INDEX)->start();
 	hensor->getSensor(SENSOR_NH3_INDEX)->start();
 
-	Communicator::getInstance()->start();
-
 	// We can't enable BLE & WiFi at the same time: https://github.com/espressif/esp-idf/issues/12414
 	// and that's why we enable just one
 	if ( !hensor->isProductionMode() ) {
@@ -47,6 +45,8 @@ void setup() {
 		}
 		Network::getInstance()->connect();
 	}
+
+	Communicator::getInstance()->start();
 }
 
 
