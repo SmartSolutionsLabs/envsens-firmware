@@ -50,6 +50,14 @@ Network::Network() : server(80) {
 	WiFi.onEvent(onConnected, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_CONNECTED);
 	WiFi.onEvent(onAddressed, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_GOT_IP);
 	WiFi.onEvent(onDisconnected, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_DISCONNECTED);
+
+	WiFi.onEvent(onDisconnected, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_DISCONNECTED);
+	WiFi.onEvent(
+		[](WiFiEvent_t event, WiFiEventInfo_t info) {
+			Serial.print("WiFi lost IP\n");
+		},
+		WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_LOST_IP
+	);
 }
 
 void Network::onConnected(WiFiEvent_t event, WiFiEventInfo_t info) {
