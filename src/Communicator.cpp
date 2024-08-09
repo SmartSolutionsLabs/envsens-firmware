@@ -33,12 +33,12 @@ void Communicator::parseIncome(void * data) {
 	jsonResponse["success"] = true;
 	switch(cmd) {
 		case 0: {
-            jsonResponse["nro_serie"] = hensor->getDeviceSerialNumber();
-    		jsonResponse["tipo_modelo"] = 1;
+			jsonResponse["nro_serie"] = hensor->getDeviceSerialNumber();
+			jsonResponse["tipo_modelo"] = hensor->getType();
 			Serial.println("case 0 , asked");
-            break;
+			break;
 		}
-        case 1: {
+		case 1: {
 			jsonResponse["version"] = 1.0f;
 			jsonResponse["relays"] = 1;
 			break;
@@ -69,9 +69,11 @@ void Communicator::parseIncome(void * data) {
 			break;
 		}
 		case 9: {
-			String dateTime(jsonRequest["time"].as<String>());
+			String dateTime = jsonRequest["time"];
 
-			hensor->setTime(dateTime);
+			if (dateTime) {
+				hensor->setTime(dateTime);
+			}
 
 			break;
 		}
@@ -84,26 +86,43 @@ void Communicator::parseIncome(void * data) {
 			String name = jsonRequest["name"];
 			String serialNumber = jsonRequest["serialNumber"];
 			String bluetoothName = jsonRequest["bluetoothName"];
-			hensor->setDeviceName(name);
-			hensor->setDeviceSerialNumber(serialNumber);
-			hensor->setBluetoothName(bluetoothName);
-			hensor->setNetworkHostname(name);
+
+			if (name) {
+				hensor->setDeviceName(name);
+				hensor->setNetworkHostname(name);
+			}
+			if (serialNumber) {
+				hensor->setDeviceSerialNumber(serialNumber);
+			}
+			if (bluetoothName) {
+				hensor->setBluetoothName(bluetoothName);
+			}
 			break;
 		}
 		case 1001: {
 			String hostname = jsonRequest["host"];
 			String post = jsonRequest["post"];
 
-			hensor->setEndpointHostname(hostname);
-			hensor->setEndpointPost(post);
+			if (hostname) {
+				hensor->setEndpointHostname(hostname);
+			}
+			if (post) {
+				hensor->setEndpointPost(post);
+			}
 
 			break;
 		}
 		case 1002: {
 			uint32_t interval = jsonRequest["lap-wifi"];
-			uint32_t localinterval = jsonRequest["lap-ble"];
-			hensor->setNetworkInterval(interval);
-			hensor->setLocalInterval(localinterval);
+			uint32_t localInterval = jsonRequest["lap-ble"];
+
+			if (interval) {
+				hensor->setNetworkInterval(interval);
+			}
+			if (localInterval) {
+				hensor->setLocalInterval(localInterval);
+			}
+
 			break;
 		}
 		case 1003: {
@@ -143,6 +162,7 @@ void Communicator::parseIncome(void * data) {
 			hensor->getWifiCredentials(wifiSsid, wifiPass);
 			DateTime now = hensor->getRtcNow();
 			jsonResponse["name"] = hensor->getDeviceName();
+			jsonResponse["type"] = hensor->getType();
 			jsonResponse["serialNumber"] = hensor->getDeviceSerialNumber();
 			jsonResponse["interval"] = this->networkInterval;
 			jsonResponse["time"] = now.timestamp(DateTime::TIMESTAMP_FULL);
