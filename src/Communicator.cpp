@@ -87,7 +87,7 @@ void Communicator::parseIncome(void * data) {
 			hensor->setDeviceName(name);
 			hensor->setDeviceSerialNumber(serialNumber);
 			hensor->setBluetoothName(bluetoothName);
-			hensor->setNetworkHostname(name);	
+			hensor->setNetworkHostname(name);
 			break;
 		}
 		case 1001: {
@@ -179,9 +179,8 @@ void Communicator::sendOut() {
 	// Catch here so more accurate
 	Datagas currentDatagas = Hensor::getInstance()->getCurrentDatagas();
 	if(WiFi.status() != WL_CONNECTED){
-		
 	}
-	
+
 	WiFiClientSecure httpClient;
 	httpClient.setInsecure();
 	if (!httpClient.connect(this->endpoint.hostname.c_str(), 443)) {
@@ -242,6 +241,9 @@ void Communicator::run(void * data) {
 	static TickType_t delay = 1 / portTICK_PERIOD_MS;
 	static Hensor * hensor = Hensor::getInstance();
 	static int sendingInterval = hensor->isProductionMode() ? this->networkInterval : this->localInterval;
+
+	// A little delay
+	vTaskDelay(1000 / portTICK_PERIOD_MS);
 
 	this->iterationDelay = 10 / portTICK_PERIOD_MS;
 
