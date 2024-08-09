@@ -24,7 +24,9 @@ class Sensor : public Thread {
 
 		bool isConnected() const;
 
-		void testReset() const;
+		void testReset();
+
+		void resetRemaining();
 };
 
 #endif

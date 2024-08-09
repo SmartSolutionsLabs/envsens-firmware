@@ -13,20 +13,22 @@ void Multisensor::connect(void * data) {
 		this->connectedStatus = this->sensor->begin();
 		vTaskDelay(50 / portTICK_PERIOD_MS);
 	}
+
+	this->resetRemaining();
 }
 
 void Multisensor::run(void* data) {
 	Hensor * hensor = Hensor::getInstance();
 
-	if (hensor->isProductionMode()) {
-		this->testReset();
-	}
-
 	while (1) {
 		vTaskDelay(this->iterationDelay);
 
 		if (! this->sensor->performReading()) {
-			Serial.print("Failed to perform reading\n");
+			if (hensor->isProductionMode()) {
+				this->testReset();
+			}
+			Serial.print(this->name);
+			Serial.print(" failed to perform reading\n");
 			continue;
 		}
 

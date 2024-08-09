@@ -7,10 +7,12 @@ bool Sensor::isConnected() const {
 	return this->connectedStatus;
 }
 
-void Sensor::testReset() const {
-	if (!this->connectedStatus) {
-		Serial.print(this->name);
-		Serial.print(" sensor unable to connect\n");
-		esp_restart();
+void Sensor::testReset() {
+	if (--this->remainingAttempts == 0) {
+		//esp_restart();
 	}
+}
+
+void Sensor::resetRemaining() {
+	this->remainingAttempts = 10;
 }
