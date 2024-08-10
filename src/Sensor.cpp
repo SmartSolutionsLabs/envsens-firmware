@@ -9,10 +9,10 @@ bool Sensor::isConnected() const {
 
 void Sensor::testReset() {
 	if (--this->remainingAttempts == 0) {
-		//esp_restart();
+		esp_restart();
 	}
 }
 
 void Sensor::resetRemaining() {
-	this->remainingAttempts = 10;
+	this->remainingAttempts = 20;
 }

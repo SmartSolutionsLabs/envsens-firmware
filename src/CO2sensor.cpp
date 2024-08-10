@@ -29,8 +29,7 @@ void CO2sensor::run(void* data) {
 			if (hensor->isProductionMode()) {
 				this->testReset();
 			}
-			Serial.print(this->name);
-			Serial.print(" failed to perform reading\n");
+			Serial.print("CO2 failed to perform reading\n");
 			continue;
 		}
 
