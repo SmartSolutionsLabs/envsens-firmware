@@ -21,10 +21,6 @@ void NH3sensor::connect(void * data) {
 void NH3sensor::run(void* data) {
 	Hensor * hensor = Hensor::getInstance();
 
-	if (hensor->isProductionMode()) {
-		this->testReset();
-	}
-
 	int16_t iterationsMeassure = 3;
 	while (1) {
 		vTaskDelay(this->iterationDelay);
