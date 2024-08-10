@@ -152,7 +152,7 @@ void Hensor::setDeviceName(String name, bool persistent) {
 }
 
 String Hensor::getDeviceName() const {
-	return this->deviceSerialNumber;
+	return this->deviceName;
 }
 
 void Hensor::setDeviceSerialNumber(String serialNumber, bool persistent) {
