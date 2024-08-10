@@ -210,6 +210,10 @@ void Communicator::sendOut() {
 	if (!httpClient.connect(this->endpoint.hostname.c_str(), 443)) {
 		Serial.print("Failed connection to ");
 		Serial.println(this->endpoint.hostname);
+
+		Datalogger::getInstance()->saveLocalStorageRow(currentDatagas);
+
+		httpClient.stop();
 		return;
 	}
 	else {
