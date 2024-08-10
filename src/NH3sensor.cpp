@@ -26,12 +26,8 @@ void NH3sensor::run(void* data) {
 		vTaskDelay(this->iterationDelay);
 		if(--iterationsMeassure >= 0){
 			channelData = this->sensor->readADC_SingleEnded(0);
-			if (channelData) {
-				if (hensor->isProductionMode()) {
-					this->testReset();
-				}
-				Serial.print("NH3 failed to perform reading\n");
-			}
+			// TODO: Here must validate if we get correct data
+
 			voltage += this->sensor->computeVolts(this->channelData);
 			continue;
 		}
