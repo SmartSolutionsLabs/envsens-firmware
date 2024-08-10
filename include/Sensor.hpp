@@ -23,6 +23,10 @@ class Sensor : public Thread {
 		virtual void run(void* data) = 0;
 
 		bool isConnected() const;
+
+		void testReset();
+
+		void resetRemaining();
 };
 
 #endif

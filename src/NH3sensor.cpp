@@ -14,14 +14,11 @@ void NH3sensor::connect(void * data) {
 		this->connectedStatus = this->sensor->begin(ADS1X15_ADDRESS, static_cast<TwoWire*>(data));
 		vTaskDelay(50 / portTICK_PERIOD_MS);
 	}
+
+	this->resetRemaining();
 }
 
 void NH3sensor::run(void* data) {
-	if (!this->connectedStatus) {
-		Serial.print("NH3 sensor unable to connect\n");
-		esp_restart();
-	}
-
 	Hensor * hensor = Hensor::getInstance();
 
 	int16_t iterationsMeassure = 3;
@@ -29,6 +26,8 @@ void NH3sensor::run(void* data) {
 		vTaskDelay(this->iterationDelay);
 		if(--iterationsMeassure >= 0){
 			channelData = this->sensor->readADC_SingleEnded(0);
+			// TODO: Here must validate if we get correct data
+
 			voltage += this->sensor->computeVolts(this->channelData);
 			continue;
 		}

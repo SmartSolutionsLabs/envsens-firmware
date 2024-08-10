@@ -13,14 +13,11 @@ void CO2sensor::connect(void * data) {
 		this->connectedStatus = this->sensor->begin(static_cast<TwoWire*>(data));
 		vTaskDelay(50 / portTICK_PERIOD_MS);
 	}
+
+	this->resetRemaining();
 }
 
 void CO2sensor::run(void* data) {
-	if (!this->connectedStatus) {
-		Serial.print("CO2 sensor unable to connect\n");
-		esp_restart();
-	}
-
 	this->iterationDelay = 5000 / portTICK_PERIOD_MS;
 
 	Hensor * hensor = Hensor::getInstance();
@@ -29,7 +26,10 @@ void CO2sensor::run(void* data) {
 		vTaskDelay(this->iterationDelay);
 
 		if (!this->sensor->readMeasurement()) {
-			Serial.print("Failed to perform reading\n");
+			if (hensor->isProductionMode()) {
+				this->testReset();
+			}
+			Serial.print("CO2 failed to perform reading\n");
 			continue;
 		}
 

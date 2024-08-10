@@ -21,8 +21,10 @@ void setup() {
 	xDelay = 500 / portTICK_PERIOD_MS;
 
 	hensor = Hensor::getInstance();
+	if (hensor->getType() == NODE_MASTER_TYPE) {
+		hensor->getSensor(SENSOR_CO2_INDEX)->start();
+	}
 	hensor->getSensor(SENSOR_MULTI_INDEX)->start();
-	hensor->getSensor(SENSOR_CO2_INDEX)->start();
 	hensor->getSensor(SENSOR_NH3_INDEX)->start();
 
 	// We can't enable BLE & WiFi at the same time: https://github.com/espressif/esp-idf/issues/12414
