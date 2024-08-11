@@ -48,6 +48,7 @@ void Datalogger::saveLocalStorageRow(const Datagas &datagas) {
 	this->preferences.putFloat(String("r_va3_" + String(availableIndex)).c_str(), datagas.temperature);
 	this->preferences.putFloat(String("r_va4_" + String(availableIndex)).c_str(), datagas.humidity);
 	this->preferences.putFloat(String("r_va5_" + String(availableIndex)).c_str(), datagas.pressure);
+	this->preferences.putFloat(String("r_va6_" + String(availableIndex)).c_str(), datagas.battery);
 
 	// Replace accumulator with new index
 	this->preferences.putUChar("index", availableIndex);
@@ -65,6 +66,7 @@ Datagas Datalogger::readLocalStorageRow(uint8_t index) {
 	datagas.temperature = this->preferences.getFloat(String("r_va3_" + String(index)).c_str(), 0.0f);
 	datagas.humidity = this->preferences.getFloat(String("r_va4_" + String(index)).c_str(), 0.0f);
 	datagas.pressure = this->preferences.getFloat(String("r_va5_" + String(index)).c_str(), 0.0f);
+	datagas.battery = this->preferences.getFloat(String("r_va6_" + String(index)).c_str(), 0.0f);
 
 	return datagas;
 }
@@ -76,6 +78,7 @@ void Datalogger::cleanLocalStorageRow(uint8_t index) {
 	this->preferences.remove(String("r_va3_" + String(index)).c_str());
 	this->preferences.remove(String("r_va4_" + String(index)).c_str());
 	this->preferences.remove(String("r_va5_" + String(index)).c_str());
+	this->preferences.remove(String("r_va6_" + String(index)).c_str());
 
 	// Since this is not a queue, we need to donwgrade
 	this->preferences.putUChar("index", index - 1);

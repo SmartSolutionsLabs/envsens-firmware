@@ -418,6 +418,14 @@ void Hensor::holdPressureValue(uint32_t value) {
 
 Datagas Hensor::getCurrentDatagas() {
 	this->currentDatagas.unixtime = this->rtc.now().unixtime();
+
+	// Calculate battery percentage
+	float readed_battery = analogRead(15) * 3.30 / 4096;
+	if (readed_battery > 3.10) {
+		readed_battery = 3.10;
+	}
+	this->currentDatagas.battery = (readed_battery - 2.00) * 100 / 1.1;
+
 	return this->currentDatagas;
 }
 

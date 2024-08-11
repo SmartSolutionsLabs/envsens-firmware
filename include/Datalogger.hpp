@@ -29,6 +29,7 @@ struct Datagas {
 	float_t temperature = 0.0f;
 	float_t humidity = 0.0f;
 	float_t pressure = 0.0f;
+	float_t battery = 0.0f;
 };
 
 /**

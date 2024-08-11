@@ -224,10 +224,7 @@ bool Communicator::sendOut(Datagas& currentDatagas) {
 		jsonResponse["temp"] = currentDatagas.temperature;
 		jsonResponse["hr"] = currentDatagas.humidity;
 		jsonResponse["pr"] = currentDatagas.pressure;
-		float readed_battery = analogRead(15)*3.30/4096;
-		if(readed_battery > 3.10 ) readed_battery = 3.10;
-		float percentage = (readed_battery - 2.00)*100/1.1;
-		jsonResponse["pila"] = percentage ;
+		jsonResponse["pila"] = currentDatagas.battery;
 		String body;
 		serializeJson(jsonResponse, body);
 
