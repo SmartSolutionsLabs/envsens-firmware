@@ -9,6 +9,7 @@ CO2sensor::CO2sensor(const char * name, int taskCore) : Sensor(name, taskCore) {
 void CO2sensor::connect(void * data) {
 	this->sensor = new SCD4x();
 
+	vTaskDelay(50 / portTICK_PERIOD_MS); // Not usable but time is documented in hardware manual
 	this->connectedStatus = this->sensor->begin(static_cast<TwoWire*>(data));
 }
 
@@ -17,7 +18,7 @@ void CO2sensor::run(void* data) {
 		this->stop();
 	}
 
-	this->iterationDelay = 3000 / portTICK_PERIOD_MS;
+	this->iterationDelay = 10000 / portTICK_PERIOD_MS;
 
 	Hensor * hensor = Hensor::getInstance();
 
