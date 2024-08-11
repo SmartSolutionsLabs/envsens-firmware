@@ -5,6 +5,7 @@
 
 #include "FS.h"
 #include <ArduinoQueue.h>
+#include <Preferences.h>
 
 #ifndef DATALOGGER_QUEUE_SIZE_ITEMS
 #define DATALOGGER_QUEUE_SIZE_ITEMS 128
@@ -43,6 +44,11 @@ class Datalogger : public Thread {
 
 		volatile bool saving = false;
 
+		/**
+		 * Store for local data.
+		 */
+		Preferences preferences;
+
 	public:
 		static Datalogger * getInstance();
 		Datalogger(Datalogger &other) = delete;
@@ -62,6 +68,21 @@ class Datalogger : public Thread {
 		 * Unixtime is gotten inside.
 		 */
 		void append(uint32_t co2, uint32_t nh3, float_t temperature, float_t humidity, float_t pressure);
+
+		/**
+		 * Insert a row in local storage.
+		 */
+		void saveLocalStorageRow(const Datagas &datagas);
+
+		/**
+		 * Select a row in local storage.
+		 */
+		Datagas readLocalStorageRow(uint8_t index);
+
+		/**
+		 * Remove keys for that index in local storage.
+		 */
+		void cleanLocalStorageRow(uint8_t index);
 
 		/**
 		 * Fill the queue that must be empty with records.
