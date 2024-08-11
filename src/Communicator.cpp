@@ -324,6 +324,9 @@ void Communicator::run(void * data) {
 				}
 
 				Datalogger::getInstance()->cleanLocalStorageRow(lastIndex);
+
+				// Decrement for the next row
+				--lastIndex;
 			}
 
 			hensor->setSendingOut(false);
