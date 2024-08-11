@@ -10,15 +10,16 @@ NH3sensor::NH3sensor(const char * name, int taskCore) : Sensor(name, taskCore) {
 void NH3sensor::connect(void * data) {
 	this->sensor = new Adafruit_ADS1115();
 
-	while (--this->remainingAttempts && !this->connectedStatus) {
-		this->connectedStatus = this->sensor->begin(ADS1X15_ADDRESS, static_cast<TwoWire*>(data));
-		vTaskDelay(50 / portTICK_PERIOD_MS);
-	}
-
-	this->resetRemaining();
+	this->connectedStatus = this->sensor->begin(ADS1X15_ADDRESS, static_cast<TwoWire*>(data));
 }
 
 void NH3sensor::run(void* data) {
+	if( !this->connectedStatus ) {
+		this->stop();
+	}
+
+	this->iterationDelay = 3000 / portTICK_PERIOD_MS;
+
 	Hensor * hensor = Hensor::getInstance();
 
 	int16_t iterationsMeassure = 3;

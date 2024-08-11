@@ -9,16 +9,15 @@ CO2sensor::CO2sensor(const char * name, int taskCore) : Sensor(name, taskCore) {
 void CO2sensor::connect(void * data) {
 	this->sensor = new SCD4x();
 
-	while (--this->remainingAttempts && !this->connectedStatus) {
-		this->connectedStatus = this->sensor->begin(static_cast<TwoWire*>(data));
-		vTaskDelay(50 / portTICK_PERIOD_MS);
-	}
-
-	this->resetRemaining();
+	this->connectedStatus = this->sensor->begin(static_cast<TwoWire*>(data));
 }
 
 void CO2sensor::run(void* data) {
-	this->iterationDelay = 5000 / portTICK_PERIOD_MS;
+	if( !this->connectedStatus ) {
+		this->stop();
+	}
+
+	this->iterationDelay = 3000 / portTICK_PERIOD_MS;
 
 	Hensor * hensor = Hensor::getInstance();
 

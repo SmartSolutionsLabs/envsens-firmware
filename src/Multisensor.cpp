@@ -9,15 +9,16 @@ Multisensor::Multisensor(const char * name, int taskCore) : Sensor(name, taskCor
 void Multisensor::connect(void * data) {
 	this->sensor = new Adafruit_BME680(static_cast<TwoWire*>(data));
 
-	while (--this->remainingAttempts && !this->connectedStatus) {
-		this->connectedStatus = this->sensor->begin();
-		vTaskDelay(50 / portTICK_PERIOD_MS);
-	}
-
-	this->resetRemaining();
+	this->connectedStatus = this->sensor->begin();
 }
 
 void Multisensor::run(void* data) {
+	if( !this->connectedStatus ) {
+		this->stop();
+	}
+
+	this->iterationDelay = 3000 / portTICK_PERIOD_MS;
+
 	Hensor * hensor = Hensor::getInstance();
 
 	while (1) {
