@@ -199,22 +199,15 @@ void Communicator::parseIncome(void * data) {
 	Ble::bleCallback->writeLargeText(Ble::resCharacteristic, answer);
 }
 
-void Communicator::sendOut() {
-	// Catch here so more accurate
-	Datagas currentDatagas = Hensor::getInstance()->getCurrentDatagas();
-	if(WiFi.status() != WL_CONNECTED){
-	}
-
+bool Communicator::sendOut(Datagas& currentDatagas) {
 	WiFiClientSecure httpClient;
 	httpClient.setInsecure();
 	if (!httpClient.connect(this->endpoint.hostname.c_str(), 443)) {
 		Serial.print("Failed connection to ");
 		Serial.println(this->endpoint.hostname);
 
-		Datalogger::getInstance()->saveLocalStorageRow(currentDatagas);
-
 		httpClient.stop();
-		return;
+		return false;
 	}
 	else {
 		// Process datagas catched at start
@@ -258,6 +251,8 @@ void Communicator::sendOut() {
 		}
 
 		httpClient.stop();
+
+		return true;
 	}
 }
 
@@ -299,7 +294,14 @@ void Communicator::run(void * data) {
 		// if there is WiFi connection
 		else if (!hensor->isSendingOut() && this->endpoint.hostname.length() && WiFi.status() == WL_CONNECTED) {
 			hensor->setSendingOut(true);
-			this->sendOut();
+
+			// Catch here so more accurate
+			Datagas currentDatagas = Hensor::getInstance()->getCurrentDatagas();
+			if (!this->sendOut(currentDatagas)) {
+				// Because it was not sent
+				Datalogger::getInstance()->saveLocalStorageRow(currentDatagas);
+			}
+
 			hensor->setSendingOut(false);
 		}
 	}
