@@ -80,6 +80,11 @@ class Datalogger : public Thread {
 		Datagas readLocalStorageRow(uint8_t index);
 
 		/**
+		 * View the last used index for local storage.
+		 */
+		uint8_t getLastLocalStorageIndex();
+
+		/**
 		 * Remove keys for that index in local storage.
 		 */
 		void cleanLocalStorageRow(uint8_t index);

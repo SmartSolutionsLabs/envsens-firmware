@@ -200,6 +200,10 @@ void Communicator::parseIncome(void * data) {
 }
 
 bool Communicator::sendOut(Datagas& currentDatagas) {
+	if (WiFi.status() != WL_CONNECTED) {
+		return false;
+	}
+
 	WiFiClientSecure httpClient;
 	httpClient.setInsecure();
 	if (!httpClient.connect(this->endpoint.hostname.c_str(), 443)) {
@@ -292,7 +296,7 @@ void Communicator::run(void * data) {
 		// Here is for production mode
 		// if the endpoint is empty we can't send anything
 		// if there is WiFi connection
-		else if (!hensor->isSendingOut() && this->endpoint.hostname.length() && WiFi.status() == WL_CONNECTED) {
+		else if (!hensor->isSendingOut() && this->endpoint.hostname.length()) {
 			hensor->setSendingOut(true);
 
 			// Catch here so more accurate
@@ -300,6 +304,26 @@ void Communicator::run(void * data) {
 			if (!this->sendOut(currentDatagas)) {
 				// Because it was not sent
 				Datalogger::getInstance()->saveLocalStorageRow(currentDatagas);
+
+				hensor->setSendingOut(false);
+				continue;
+			}
+
+			// Try while there is connection
+			uint8_t lastIndex = Datalogger::getInstance()->getLastLocalStorageIndex();
+			Serial.print(lastIndex);
+			Serial.print(" (lastIndex)\n");
+			while (lastIndex) {
+				Datagas datagas = Datalogger::getInstance()->readLocalStorageRow(lastIndex);
+				Serial.print(datagas.unixtime);
+				Serial.print(" (unixtime)\n");
+
+				if (!this->sendOut(currentDatagas)) {
+					// Don't try because we didn't reach server
+					break;
+				}
+
+				Datalogger::getInstance()->cleanLocalStorageRow(lastIndex);
 			}
 
 			hensor->setSendingOut(false);

@@ -53,6 +53,10 @@ void Datalogger::saveLocalStorageRow(const Datagas &datagas) {
 	this->preferences.putUChar("index", availableIndex);
 }
 
+uint8_t Datalogger::getLastLocalStorageIndex() {
+	return this->preferences.getUChar("index", 0);
+}
+
 Datagas Datalogger::readLocalStorageRow(uint8_t index) {
 	Datagas datagas;
 	datagas.unixtime = (time_t) this->preferences.getULong64(String("r_tim_" + String(index)).c_str(), 0);
@@ -72,6 +76,9 @@ void Datalogger::cleanLocalStorageRow(uint8_t index) {
 	this->preferences.remove(String("r_va3_" + String(index)).c_str());
 	this->preferences.remove(String("r_va4_" + String(index)).c_str());
 	this->preferences.remove(String("r_va5_" + String(index)).c_str());
+
+	// Since this is not a queue, we need to donwgrade
+	this->preferences.putUChar("index", index - 1);
 }
 
 FILE * Datalogger::getDatabaseFile() const {
