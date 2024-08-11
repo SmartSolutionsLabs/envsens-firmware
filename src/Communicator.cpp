@@ -311,12 +311,9 @@ void Communicator::run(void * data) {
 
 			// Try while there is connection
 			uint8_t lastIndex = Datalogger::getInstance()->getLastLocalStorageIndex();
-			Serial.print(lastIndex);
-			Serial.print(" (lastIndex)\n");
 			while (lastIndex) {
 				Datagas datagas = Datalogger::getInstance()->readLocalStorageRow(lastIndex);
-				Serial.print(datagas.unixtime);
-				Serial.print(" (unixtime)\n");
+				ESP_LOGI(HENSOR_TAG, "Index selected to send: %d; unixtime: %d", lastIndex, datagas.unixtime);
 
 				if (!this->sendOut(currentDatagas)) {
 					// Don't try because we didn't reach server
