@@ -546,11 +546,9 @@ void Hensor::assemblySensorsStatus(std::string &jsonString) {
 	jsonResponse["data"][i]["id"] = i;
 	jsonResponse["data"][i]["s_type"] = 6;
 	jsonResponse["data"][i]["name"] = "Battery";
-	float readed_battery = analogRead(15)*3.30/4096;
-	if(readed_battery > 3.10 ) readed_battery = 3.10;
-	jsonResponse["data"][i]["l1"] = String((readed_battery - 2.00)*100/1.1) + "%";
-	jsonResponse["data"][i]["l2"] = String(analogRead(15)*3.30/4096);
-	ESP_LOGI(HENSOR_TAG, "Battery-Voltage: %.2f", analogRead(15)*3.30/4096);
+	jsonResponse["data"][i]["l1"] = String(currentDatagas.battery) + "%";
+	jsonResponse["data"][i]["l2"] = String(( currentDatagas.battery * 1.1 / 100.0 ) + 2.0, 2);
+	ESP_LOGI(HENSOR_TAG, "Battery: %.2f", currentDatagas.battery);
 
 	i++;
 	jsonResponse["data"][i]["id"] = i;
