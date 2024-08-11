@@ -199,10 +199,9 @@ void Communicator::parseIncome(void * data) {
 	Ble::bleCallback->writeLargeText(Ble::resCharacteristic, answer);
 }
 
-void Communicator::sendOut() {
-	// Catch here so more accurate
-	Datagas currentDatagas = Hensor::getInstance()->getCurrentDatagas();
-	if(WiFi.status() != WL_CONNECTED){
+bool Communicator::sendOut(Datagas& currentDatagas) {
+	if (WiFi.status() != WL_CONNECTED) {
+		return false;
 	}
 
 	WiFiClientSecure httpClient;
@@ -210,7 +209,9 @@ void Communicator::sendOut() {
 	if (!httpClient.connect(this->endpoint.hostname.c_str(), 443)) {
 		Serial.print("Failed connection to ");
 		Serial.println(this->endpoint.hostname);
-		return;
+
+		httpClient.stop();
+		return false;
 	}
 	else {
 		// Process datagas catched at start
@@ -254,6 +255,8 @@ void Communicator::sendOut() {
 		}
 
 		httpClient.stop();
+
+		return true;
 	}
 }
 
@@ -293,9 +296,36 @@ void Communicator::run(void * data) {
 		// Here is for production mode
 		// if the endpoint is empty we can't send anything
 		// if there is WiFi connection
-		else if (!hensor->isSendingOut() && this->endpoint.hostname.length() && WiFi.status() == WL_CONNECTED) {
+		else if (!hensor->isSendingOut() && this->endpoint.hostname.length()) {
 			hensor->setSendingOut(true);
-			this->sendOut();
+
+			// Catch here so more accurate
+			Datagas currentDatagas = Hensor::getInstance()->getCurrentDatagas();
+			if (!this->sendOut(currentDatagas)) {
+				// Because it was not sent
+				Datalogger::getInstance()->saveLocalStorageRow(currentDatagas);
+
+				hensor->setSendingOut(false);
+				continue;
+			}
+
+			// Try while there is connection
+			uint8_t lastIndex = Datalogger::getInstance()->getLastLocalStorageIndex();
+			while (lastIndex) {
+				currentDatagas = Datalogger::getInstance()->readLocalStorageRow(lastIndex);
+				ESP_LOGI(HENSOR_TAG, "Index selected to send: %d; unixtime: %d", lastIndex, currentDatagas.unixtime);
+
+				if (!this->sendOut(currentDatagas)) {
+					// Don't try because we didn't reach server
+					break;
+				}
+
+				Datalogger::getInstance()->cleanLocalStorageRow(lastIndex);
+
+				// Decrement for the next row
+				--lastIndex;
+			}
+
 			hensor->setSendingOut(false);
 		}
 	}

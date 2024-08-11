@@ -1,6 +1,7 @@
 #ifndef INC_COMMUNICATOR
 #define INC_COMMUNICATOR
 
+#include "Datalogger.hpp"
 #include "Thread.hpp"
 #include "Ble.hpp"
 
@@ -49,7 +50,7 @@ class Communicator : public Thread {
 		/**
 		 * Sends data to exterior.
 		 */
-		inline void sendOut();
+		bool sendOut(Datagas& datagas);
 
 		/**
 		 * Append an instruction to queue for processing in the thread.

@@ -16,17 +16,7 @@ Datalogger * Datalogger::getInstance() {
 }
 
 Datalogger::Datalogger(const char * name) : Thread(name), queue(DATALOGGER_QUEUE_SIZE_ITEMS) {
-	// Execute in interval of time
-	if(this->saverTimer == nullptr) {
-		const esp_timer_create_args_t periodic_timer_args = {
-				.callback = &interruptDataSaver,
-				.arg = NULL,
-				.dispatch_method = ESP_TIMER_TASK,
-				.name = "saver_timer"
-		};
-		esp_timer_create(&periodic_timer_args, &this->saverTimer);
-		esp_timer_start_periodic(this->saverTimer, 1000000 / 100); // Fraction of time
-	}
+	this->preferences.begin("data", false); // Namespace for local storage
 }
 
 void Datalogger::run(void * data) {
@@ -42,6 +32,53 @@ void Datalogger::run(void * data) {
 
 		this->save();
 	}
+}
+
+void Datalogger::saveLocalStorageRow(const Datagas &datagas) {
+	uint8_t availableIndex = this->preferences.getUChar("index", 0) + 1;
+
+	if (availableIndex > 16) {
+		// reset counter
+		availableIndex = 1;
+	}
+
+	this->preferences.putULong64(String("r_tim_" + String(availableIndex)).c_str(), datagas.unixtime);
+	this->preferences.putUInt(String("r_va1_" + String(availableIndex)).c_str(), datagas.co2);
+	this->preferences.putUInt(String("r_va2_" + String(availableIndex)).c_str(), datagas.nh3);
+	this->preferences.putFloat(String("r_va3_" + String(availableIndex)).c_str(), datagas.temperature);
+	this->preferences.putFloat(String("r_va4_" + String(availableIndex)).c_str(), datagas.humidity);
+	this->preferences.putFloat(String("r_va5_" + String(availableIndex)).c_str(), datagas.pressure);
+
+	// Replace accumulator with new index
+	this->preferences.putUChar("index", availableIndex);
+}
+
+uint8_t Datalogger::getLastLocalStorageIndex() {
+	return this->preferences.getUChar("index", 0);
+}
+
+Datagas Datalogger::readLocalStorageRow(uint8_t index) {
+	Datagas datagas;
+	datagas.unixtime = (time_t) this->preferences.getULong64(String("r_tim_" + String(index)).c_str(), 0);
+	datagas.co2 = this->preferences.getUInt(String("r_va1_" + String(index)).c_str(), 0);
+	datagas.nh3 = this->preferences.getUInt(String("r_va2_" + String(index)).c_str(), 0);
+	datagas.temperature = this->preferences.getFloat(String("r_va3_" + String(index)).c_str(), 0.0f);
+	datagas.humidity = this->preferences.getFloat(String("r_va4_" + String(index)).c_str(), 0.0f);
+	datagas.pressure = this->preferences.getFloat(String("r_va5_" + String(index)).c_str(), 0.0f);
+
+	return datagas;
+}
+
+void Datalogger::cleanLocalStorageRow(uint8_t index) {
+	this->preferences.remove(String("r_tim_" + String(index)).c_str());
+	this->preferences.remove(String("r_va1_" + String(index)).c_str());
+	this->preferences.remove(String("r_va2_" + String(index)).c_str());
+	this->preferences.remove(String("r_va3_" + String(index)).c_str());
+	this->preferences.remove(String("r_va4_" + String(index)).c_str());
+	this->preferences.remove(String("r_va5_" + String(index)).c_str());
+
+	// Since this is not a queue, we need to donwgrade
+	this->preferences.putUChar("index", index - 1);
 }
 
 FILE * Datalogger::getDatabaseFile() const {
