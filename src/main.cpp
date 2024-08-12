@@ -70,7 +70,7 @@ void loop() {
 		}
 
 		// Verify if button is pressed and hold for 3 seconds
-		if (xTaskGetTickCount() - startInstant >= 3000) {
+		if (xTaskGetTickCount() - startInstant >= 100) {
 			// Execute the function we need to change if BLE or WiFi in next start
 			hensor->setProductionMode( !hensor->isProductionMode() ); // toggle
 
