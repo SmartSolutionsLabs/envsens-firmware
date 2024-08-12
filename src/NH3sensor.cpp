@@ -36,9 +36,9 @@ void NH3sensor::run(void* data) {
 		voltage = voltage / 3;
 		ESP_LOGI(HENSOR_TAG, "Channel data: %d", this->channelData);
 		ESP_LOGI(HENSOR_TAG, "Voltage: %.2f", this->voltage);
-		ESP_LOGI(HENSOR_TAG, "NH3-PPM: %d", hensor->FunctionCO2Calibrated(this->voltage));
+		ESP_LOGI(HENSOR_TAG, "NH3-PPM: %d", hensor->FunctionNH3Calibrated(this->voltage));
 
-		hensor->holdNH3Value(hensor->FunctionCO2Calibrated(this->voltage));
+		hensor->holdNH3Value(hensor->FunctionNH3Calibrated(this->voltage));
 		voltage = 0;
 	}
 
