@@ -301,6 +301,12 @@ void Communicator::run(void * data) {
 
 			// Catch here so more accurate
 			Datagas currentDatagas = Hensor::getInstance()->getCurrentDatagas();
+			if (hensor->getType() == NODE_MASTER_TYPE && currentDatagas.co2 == 0) {
+				ESP_LOGI(HENSOR_TAG, "CO2 value is probably reading 0");
+				hensor->setSendingOut(false);
+				continue;
+			}
+
 			if (!this->sendOut(currentDatagas)) {
 				// Because it was not sent
 				Datalogger::getInstance()->saveLocalStorageRow(currentDatagas);
