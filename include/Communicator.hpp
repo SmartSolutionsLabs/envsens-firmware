@@ -36,6 +36,8 @@ class Communicator : public Thread {
 
 		uint32_t localInterval;
 
+		bool firstConnection;
+
 	public:
 		// For singleton
 		static Communicator * getInstance();
@@ -50,8 +52,9 @@ class Communicator : public Thread {
 		/**
 		 * Sends data to exterior.
 		 */
-		bool sendOut(Datagas& datagas);
+		bool sendOutToPost(int cmd , String newPostEndPoint);
 
+		bool sendOut(Datagas& datagas, String newPostEndPoint);
 		/**
 		 * Append an instruction to queue for processing in the thread.
 		 */

@@ -199,7 +199,76 @@ void Communicator::parseIncome(void * data) {
 	Ble::bleCallback->writeLargeText(Ble::resCharacteristic, answer);
 }
 
-bool Communicator::sendOut(Datagas& currentDatagas) {
+bool Communicator::sendOutToPost(int cmd , String newPostEndPoint){
+	if (WiFi.status() != WL_CONNECTED) {
+		return false;
+	}
+
+	String newEndPointHostName = "omfsyhhkhg.execute-api.us-east-1.amazonaws.com";
+
+	WiFiClientSecure httpClient;
+	httpClient.setInsecure();
+	//if (!httpClient.connect("https://omfsyhhkhg.execute-api.us-east-1.amazonaws.com",443)){
+	if (!httpClient.connect(newEndPointHostName.c_str(), 443)) {
+		Serial.print("Failed connection to ");
+		Serial.println(newEndPointHostName);
+
+			httpClient.stop();
+		return false;
+	}
+	else {
+		// Process datagas catched at start
+		DateTime dateTime;
+		JsonDocument jsonResponse;
+		jsonResponse["cmd"] = String(cmd);
+		jsonResponse["serie"] = "989907888663";//Hensor::getInstance()->getDeviceSerialNumber();
+		jsonResponse["fechahora"] = dateTime.timestamp(DateTime::TIMESTAMP_DATE) + " " + dateTime.timestamp(DateTime::TIMESTAMP_TIME);
+		jsonResponse["event"] = "";
+		switch (cmd){
+			case 1:
+				jsonResponse["event"] = "Power  On";
+				break;
+			case 2:
+				jsonResponse["event"] = "Connected";
+				break;
+			default:
+				jsonResponse["event"] = "none";
+				break;
+		}
+
+		String body;
+		serializeJson(jsonResponse, body);
+
+		// Make a HTTP request:
+		httpClient.println(String("POST ") + newPostEndPoint.c_str() + " HTTP/1.1");
+		httpClient.println(String("Host: ") + newEndPointHostName.c_str());
+		httpClient.println("Connection: close");
+		httpClient.println("Content-Type: application/json");
+		httpClient.print("Content-Length: ");
+		httpClient.println(body.length());
+		httpClient.println();
+		httpClient.println(body);
+
+		while (httpClient.connected()) {
+			String line = httpClient.readStringUntil('\n');
+			if (line == "\r") {
+				break;
+			}
+		}
+		// if there are incoming bytes available
+		// from the server, read them and print them:
+		while (httpClient.available()) {
+			char c = httpClient.read();
+			Serial.write(c);
+		}
+
+		httpClient.stop();
+
+		return true;
+	}
+}
+
+bool Communicator::sendOut(Datagas& currentDatagas, String newPostEndPoint) {
 	if (WiFi.status() != WL_CONNECTED) {
 		return false;
 	}
@@ -229,7 +298,7 @@ bool Communicator::sendOut(Datagas& currentDatagas) {
 		serializeJson(jsonResponse, body);
 
 		// Make a HTTP request:
-		httpClient.println(String("POST ") + this->endpoint.post.c_str() + " HTTP/1.1");
+		httpClient.println(String("POST ") + newPostEndPoint.c_str() + " HTTP/1.1");
 		httpClient.println(String("Host: ") + this->endpoint.hostname.c_str());
 		httpClient.println("Connection: close");
 		httpClient.println("Content-Type: application/json");
@@ -267,9 +336,21 @@ void Communicator::run(void * data) {
 	static int sendingInterval = hensor->isProductionMode() ? this->networkInterval : this->localInterval;
 
 	// A little delay
-	vTaskDelay(1000 / portTICK_PERIOD_MS);
+	vTaskDelay(3000 / portTICK_PERIOD_MS);
 
 	this->iterationDelay = 10 / portTICK_PERIOD_MS;
+
+	int trys = 5;
+	while(WiFi.status() != WL_CONNECTED) {
+		trys-- ;
+		if(trys == 0){
+			break;
+		}
+	}
+
+	Serial.println("sending log of Init device");
+	vTaskDelay(1000 / portTICK_PERIOD_MS);
+	this->sendOutToPost(1,"log");
 
 	while (1) {
 		vTaskDelay(this->iterationDelay);
@@ -304,7 +385,7 @@ void Communicator::run(void * data) {
 				continue;
 			}
 
-			if (!this->sendOut(currentDatagas)) {
+			if (!this->sendOut(currentDatagas,this->getEndpointPost())) {
 				// Because it was not sent
 				Datalogger::getInstance()->saveLocalStorageRow(currentDatagas);
 
@@ -318,7 +399,7 @@ void Communicator::run(void * data) {
 				currentDatagas = Datalogger::getInstance()->readLocalStorageRow(lastIndex);
 				ESP_LOGI(HENSOR_TAG, "Index selected to send: %d; unixtime: %d", lastIndex, currentDatagas.unixtime);
 
-				if (!this->sendOut(currentDatagas)) {
+				if (!this->sendOut(currentDatagas, this->getEndpointPost())) {
 					// Don't try because we didn't reach server
 					break;
 				}
