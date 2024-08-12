@@ -27,8 +27,9 @@ void NH3sensor::run(void* data) {
 		vTaskDelay(this->iterationDelay);
 		if(--iterationsMeassure >= 0){
 			channelData = this->sensor->readADC_SingleEnded(0);
-			// TODO: Here must validate if we get correct data
-
+			if(channelData < 0){
+				channelData = 0;	// TODO: Here must validate if we get correct data
+			}
 			voltage += this->sensor->computeVolts(this->channelData);
 			continue;
 		}
@@ -36,9 +37,9 @@ void NH3sensor::run(void* data) {
 		voltage = voltage / 3;
 		ESP_LOGI(HENSOR_TAG, "Channel data: %d", this->channelData);
 		ESP_LOGI(HENSOR_TAG, "Voltage: %.2f", this->voltage);
-		ESP_LOGI(HENSOR_TAG, "NH3-PPM: %d", hensor->FunctionCO2Calibrated(this->voltage));
+		ESP_LOGI(HENSOR_TAG, "NH3-PPM: %d", hensor->FunctionNH3Calibrated(this->voltage));
 
-		hensor->holdNH3Value(hensor->FunctionCO2Calibrated(this->voltage));
+		hensor->holdNH3Value(hensor->FunctionNH3Calibrated(this->voltage));
 		voltage = 0;
 	}
 
