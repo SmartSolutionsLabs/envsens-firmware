@@ -22,18 +22,33 @@ void NH3sensor::run(void* data) {
 
 	Hensor * hensor = Hensor::getInstance();
 
-	int16_t iterationsMeassure = 3;
+	uint32_t iterationsMeassure = 3;
+	int32_t realQtyMeassured = 0;
 	while (1) {
 		vTaskDelay(this->iterationDelay);
-		if(--iterationsMeassure >= 0){
+		if( iterationsMeassure-- > 0){
 			channelData = this->sensor->readADC_SingleEnded(0);
-			// TODO: Here must validate if we get correct data
-
-			voltage += this->sensor->computeVolts(this->channelData);
-			continue;
+			if(channelData < 0){
+				channelData = 0 ;
+				continue;
+			}
+			else{
+				voltage += this->sensor->computeVolts(this->channelData);
+				realQtyMeassured++;
+				continue;
+			}
 		}
+
 		iterationsMeassure = 3;
-		voltage = voltage / 3;
+
+		if(realQtyMeassured <= 0){
+			voltage = 0;
+		}
+		else{
+			voltage = voltage / realQtyMeassured;
+		}
+		realQtyMeassured = 0;
+
 		ESP_LOGI(HENSOR_TAG, "Channel data: %d", this->channelData);
 		ESP_LOGI(HENSOR_TAG, "Voltage: %.2f", this->voltage);
 		ESP_LOGI(HENSOR_TAG, "NH3-PPM: %d", hensor->FunctionNH3Calibrated(this->voltage));
