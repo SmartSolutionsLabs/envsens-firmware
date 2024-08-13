@@ -573,3 +573,16 @@ void Hensor::assemblySensorsStatus(std::string &jsonString) {
 
 	serializeJson(jsonResponse, jsonString);
 }
+
+bool Hensor::checkRemoteVersion() {
+	String response;
+	String hostname("github.com");
+	String path("/firmware.bin");
+	String body;
+
+	Communicator::getInstance()->sendOut(body, hostname, path, response);
+
+	// TODO: Parse JSON and check version
+
+	return false;
+}

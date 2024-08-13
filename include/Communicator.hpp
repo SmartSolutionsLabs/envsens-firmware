@@ -6,6 +6,7 @@
 #include "Ble.hpp"
 
 #include <ArduinoQueue.h>
+#include <HTTPUpdate.h>
 
 /**
  * Process every income and outcome.
@@ -69,6 +70,8 @@ class Communicator : public Thread {
 
 		void setNetworkInterval(uint32_t minutes);
 		void setLocalInterval(uint32_t time);
+
+		void updateFirmware() const;
 };
 
 #endif

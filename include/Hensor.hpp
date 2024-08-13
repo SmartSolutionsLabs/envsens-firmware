@@ -166,6 +166,8 @@ class Hensor {
 		float_t getPressureCalibration(int index);
 		float_t getNH3Calibration(int index);
 		float_t getCO2Calibration(int index);
+
+		bool checkRemoteVersion();
 };
 
 #endif
