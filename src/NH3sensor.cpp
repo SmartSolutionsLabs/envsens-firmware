@@ -5,6 +5,7 @@ static const char * HENSOR_TAG = "Hensor";
 
 NH3sensor::NH3sensor(const char * name, int taskCore) : Sensor(name, taskCore) {
 	this->channelData = 0;
+	this->voltage = 0;
 }
 
 void NH3sensor::connect(void * data) {
