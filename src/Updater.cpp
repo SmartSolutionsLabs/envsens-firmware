@@ -27,6 +27,7 @@ void GithubFirmwareUpdater::firmwareUpdate(void) {
     String URL_bin = URL_newFirmware_Bin;
     URL_bin.concat(this->newFirmwareVersion);
     URL_bin.concat("/firmware.bin");
+
     Serial.print("\t  ##########################\n");
     Serial.println("\t  the new URL IS :\n" + URL_bin );
     Serial.println("\t   ##########################\n");
@@ -85,7 +86,8 @@ bool GithubFirmwareUpdater::firmwareVersionCheck(void) {
     if (httpCode == HTTP_CODE_OK){
         //payload.trim();
         deserializeJson(this->getPayload,payload);
-        String msg = this->getPayload["versions"][3];
+        String msg = this->getPayload["lastest"];
+        //String msg = this->getPayload["versions"][3];
         this->newFirmwareVersion = msg;
 
         Serial.print("\t --------------- \n \t New Version Get: ");
