@@ -24,7 +24,7 @@ Network::Network() : server(80) {
 	});
 
 	// Start AsyncElegantOTA
-	ElegantOTA.begin(&server);
+	/*ElegantOTA.begin(&server);
 	ElegantOTA.setAutoReboot(true);
 	ElegantOTA.onStart([]() {
 		Serial.print("OTA update started!\n");
@@ -40,7 +40,7 @@ Network::Network() : server(80) {
 			Serial.println("OTA update failed.");
 			// Add failure handling here.
 		}
-	});
+	});*/
 
 	server.begin();
 
