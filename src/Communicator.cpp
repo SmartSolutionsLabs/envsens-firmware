@@ -199,24 +199,24 @@ void Communicator::parseIncome(void * data) {
 	Ble::bleCallback->writeLargeText(Ble::resCharacteristic, answer);
 }
 
-bool Communicator::sendOut(String& body, String& endpoint) {
+bool Communicator::sendOut(String& body, String& hostname, String& path) {
 	if (WiFi.status() != WL_CONNECTED) {
 		return false;
 	}
 
 	WiFiClientSecure httpClient;
 	httpClient.setInsecure();
-	if (!httpClient.connect(this->endpoint.hostname.c_str(), 443)) {
+	if (!httpClient.connect(hostname.c_str(), 443)) {
 		Serial.print("Failed connection to ");
-		Serial.println(this->endpoint.hostname);
+		Serial.println(hostname);
 
 		httpClient.stop();
 		return false;
 	}
 	else {
 		// Make a HTTP request:
-		httpClient.println(String("POST ") + endpoint.c_str() + " HTTP/1.1");
-		httpClient.println(String("Host: ") + this->endpoint.hostname.c_str());
+		httpClient.println(String("POST ") + path + " HTTP/1.1");
+		httpClient.println(String("Host: ") + hostname);
 		httpClient.println("Connection: close");
 		httpClient.println("Content-Type: application/json");
 		httpClient.print("Content-Length: ");
@@ -236,6 +236,7 @@ bool Communicator::sendOut(String& body, String& endpoint) {
 			char c = httpClient.read();
 			Serial.write(c);
 		}
+		Serial.write('\n');
 
 		httpClient.stop();
 
@@ -293,7 +294,7 @@ void Communicator::run(void * data) {
 			String serialization;
 			hensor->serializeDatagas(serialization, currentDatagas);
 
-			if (!this->sendOut(serialization, this->endpoint.post)) {
+			if (!this->sendOut(serialization, this->endpoint.hostname, this->endpoint.post)) {
 				// Because it was not sent
 				Datalogger::getInstance()->saveLocalStorageRow(currentDatagas);
 
@@ -308,7 +309,7 @@ void Communicator::run(void * data) {
 				ESP_LOGI(HENSOR_TAG, "Index selected to send: %d; unixtime: %d", lastIndex, currentDatagas.unixtime);
 
 				hensor->serializeDatagas(serialization, currentDatagas); // serializing again because is another datagas
-				if (!this->sendOut(serialization, this->endpoint.post)) {
+				if (!this->sendOut(serialization, this->endpoint.hostname, this->endpoint.post)) {
 					// Don't try because we didn't reach server
 					break;
 				}
