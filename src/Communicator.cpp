@@ -237,7 +237,7 @@ bool Communicator::sendOut(String& body, String& hostname, String& path, String&
 		// if there are incoming bytes available
 		// from the server, read them and print them:
 		while (httpClient.available()) {
-			response.concat(httpClient.read());
+			response.concat((char) httpClient.read());
 		}
 		response.concat('\n');
 
