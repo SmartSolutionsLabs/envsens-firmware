@@ -1,0 +1,13 @@
+{
+    "versions":[
+        "0.0.1",
+        "0.0.2",
+        "0.0.3",
+        "1.0.0"
+        ],
+    "lastestVersion":"1.0.0",
+    "compatibleBoards":[
+        "esp32-s3",
+        "esp32-s1"
+    ]
+}
