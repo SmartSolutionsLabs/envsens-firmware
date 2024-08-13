@@ -199,24 +199,24 @@ void Communicator::parseIncome(void * data) {
 	Ble::bleCallback->writeLargeText(Ble::resCharacteristic, answer);
 }
 
-bool Communicator::sendOut(String& body, String& endpoint) {
+bool Communicator::sendOut(String& body, String& hostname, String& path, String& response) {
 	if (WiFi.status() != WL_CONNECTED) {
 		return false;
 	}
 
 	WiFiClientSecure httpClient;
 	httpClient.setInsecure();
-	if (!httpClient.connect(this->endpoint.hostname.c_str(), 443)) {
+	if (!httpClient.connect(hostname.c_str(), 443)) {
 		Serial.print("Failed connection to ");
-		Serial.println(this->endpoint.hostname);
+		Serial.println(hostname);
 
 		httpClient.stop();
 		return false;
 	}
 	else {
 		// Make a HTTP request:
-		httpClient.println(String("POST ") + endpoint.c_str() + " HTTP/1.1");
-		httpClient.println(String("Host: ") + this->endpoint.hostname.c_str());
+		httpClient.println(String("POST ") + path + " HTTP/1.1");
+		httpClient.println(String("Host: ") + hostname);
 		httpClient.println("Connection: close");
 		httpClient.println("Content-Type: application/json");
 		httpClient.print("Content-Length: ");
@@ -230,12 +230,16 @@ bool Communicator::sendOut(String& body, String& endpoint) {
 				break;
 			}
 		}
+
+		// clear the response for new data
+		response = "";
+
 		// if there are incoming bytes available
 		// from the server, read them and print them:
 		while (httpClient.available()) {
-			char c = httpClient.read();
-			Serial.write(c);
+			response.concat((char) httpClient.read());
 		}
+		response.concat('\n');
 
 		httpClient.stop();
 
@@ -293,13 +297,17 @@ void Communicator::run(void * data) {
 			String serialization;
 			hensor->serializeDatagas(serialization, currentDatagas);
 
-			if (!this->sendOut(serialization, this->endpoint.post)) {
+			// Response body from server
+			String response;
+
+			if (!this->sendOut(serialization, this->endpoint.hostname, this->endpoint.post, response)) {
 				// Because it was not sent
 				Datalogger::getInstance()->saveLocalStorageRow(currentDatagas);
 
 				hensor->setSendingOut(false);
 				continue;
 			}
+			Serial.print(response);
 
 			// Try while there is connection
 			uint8_t lastIndex = Datalogger::getInstance()->getLastLocalStorageIndex();
@@ -308,10 +316,11 @@ void Communicator::run(void * data) {
 				ESP_LOGI(HENSOR_TAG, "Index selected to send: %d; unixtime: %d", lastIndex, currentDatagas.unixtime);
 
 				hensor->serializeDatagas(serialization, currentDatagas); // serializing again because is another datagas
-				if (!this->sendOut(serialization, this->endpoint.post)) {
+				if (!this->sendOut(serialization, this->endpoint.hostname, this->endpoint.post, response)) {
 					// Don't try because we didn't reach server
 					break;
 				}
+				Serial.print(response);
 
 				Datalogger::getInstance()->cleanLocalStorageRow(lastIndex);
 
