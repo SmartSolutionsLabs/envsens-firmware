@@ -1,4 +1,5 @@
 #include "Network.hpp"
+#include "Communicator.hpp"
 
 String Network::SSID;
 String Network::PASSWORD;
@@ -68,6 +69,11 @@ void Network::onAddressed(WiFiEvent_t event, WiFiEventInfo_t info) {
 	digitalWrite(NETWORK_STATUS_LED_PIN, HIGH);
 	Serial.print("WiFi.addressed: ");
 	Serial.println(WiFi.localIP());
+
+	// Send event to server
+	String response;
+	Communicator::getInstance()->sendOutEvent(100, response);
+	Serial.print(response);
 }
 
 void Network::onDisconnected(WiFiEvent_t event, WiFiEventInfo_t info) {

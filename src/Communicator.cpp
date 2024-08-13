@@ -199,6 +199,12 @@ void Communicator::parseIncome(void * data) {
 	Ble::bleCallback->writeLargeText(Ble::resCharacteristic, answer);
 }
 
+bool Communicator::sendOutEvent(unsigned int event, String& response) {
+	String path("/logs");
+	String body("{\"cmd\": \"100\"}");
+	return this->sendOut(body, this->endpoint.hostname, path, response);
+}
+
 bool Communicator::sendOut(String& body, String& hostname, String& path, String& response) {
 	if (WiFi.status() != WL_CONNECTED) {
 		return false;
