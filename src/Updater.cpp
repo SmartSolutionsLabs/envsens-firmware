@@ -79,7 +79,7 @@ bool GithubFirmwareUpdater::firmwareVersionCheck(void) {
     if (httpCode == HTTP_CODE_OK){
         //payload.trim();
         deserializeJson(this->getPayload,payload);
-        String msg = this->getPayload["versions"][0];
+        String msg = this->getPayload["versions"][3];
         this->newFirmwareVersion = msg;
 
         Serial.print("\t --------------- \n \t New Version Get: ");
