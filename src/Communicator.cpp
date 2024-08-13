@@ -200,8 +200,28 @@ void Communicator::parseIncome(void * data) {
 }
 
 bool Communicator::sendOutEvent(unsigned int event, String& response) {
+	DateTime dateTime = Hensor::getInstance()->getRtcNow();
+	JsonDocument jsonResponse;
+	jsonResponse["cmd"] = String(event);
+	jsonResponse["serie"] = Hensor::getInstance()->getDeviceSerialNumber();
+	jsonResponse["fechahora"] = dateTime.timestamp(DateTime::TIMESTAMP_DATE) + " " + dateTime.timestamp(DateTime::TIMESTAMP_TIME);
+
+	switch (event) {
+		case 1:
+			jsonResponse["event"] = "Power on";
+			break;
+		case 2:
+			jsonResponse["event"] = "Connected";
+			break;
+		default:
+			jsonResponse["event"] = "none";
+			break;
+	}
+
 	String path("/logs");
-	String body("{\"cmd\": \"100\"}");
+	String body;
+	serializeJson(jsonResponse, body);
+
 	return this->sendOut(body, this->endpoint.hostname, path, response);
 }
 
