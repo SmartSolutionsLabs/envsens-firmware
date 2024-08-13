@@ -144,6 +144,8 @@ class Hensor {
 
 		Datagas getCurrentDatagas();
 
+		void serializeDatagas(String& serialization, Datagas& datagas);
+
 		void setSendingOut(bool sending = true);
 		bool isSendingOut() const;
 		bool hasSentOnTime(int time);

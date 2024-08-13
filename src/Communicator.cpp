@@ -199,7 +199,7 @@ void Communicator::parseIncome(void * data) {
 	Ble::bleCallback->writeLargeText(Ble::resCharacteristic, answer);
 }
 
-bool Communicator::sendOut(Datagas& currentDatagas) {
+bool Communicator::sendOut(String& body, String& endpoint) {
 	if (WiFi.status() != WL_CONNECTED) {
 		return false;
 	}
@@ -214,22 +214,8 @@ bool Communicator::sendOut(Datagas& currentDatagas) {
 		return false;
 	}
 	else {
-		// Process datagas catched at start
-		DateTime dateTime(currentDatagas.unixtime);
-		JsonDocument jsonResponse;
-		jsonResponse["equipo"] = Hensor::getInstance()->getDeviceName();
-		jsonResponse["fechahora"] = dateTime.timestamp(DateTime::TIMESTAMP_DATE) + " " + dateTime.timestamp(DateTime::TIMESTAMP_TIME);
-		jsonResponse["co2"] = currentDatagas.co2;
-		jsonResponse["nh3"] = currentDatagas.nh3;
-		jsonResponse["temp"] = currentDatagas.temperature;
-		jsonResponse["hr"] = currentDatagas.humidity;
-		jsonResponse["pr"] = currentDatagas.pressure;
-		jsonResponse["pila"] = currentDatagas.battery;
-		String body;
-		serializeJson(jsonResponse, body);
-
 		// Make a HTTP request:
-		httpClient.println(String("POST ") + this->endpoint.post.c_str() + " HTTP/1.1");
+		httpClient.println(String("POST ") + endpoint.c_str() + " HTTP/1.1");
 		httpClient.println(String("Host: ") + this->endpoint.hostname.c_str());
 		httpClient.println("Connection: close");
 		httpClient.println("Content-Type: application/json");
@@ -304,7 +290,10 @@ void Communicator::run(void * data) {
 				continue;
 			}
 
-			if (!this->sendOut(currentDatagas)) {
+			String serialization;
+			hensor->serializeDatagas(serialization, currentDatagas);
+
+			if (!this->sendOut(serialization, this->endpoint.post)) {
 				// Because it was not sent
 				Datalogger::getInstance()->saveLocalStorageRow(currentDatagas);
 
@@ -318,7 +307,8 @@ void Communicator::run(void * data) {
 				currentDatagas = Datalogger::getInstance()->readLocalStorageRow(lastIndex);
 				ESP_LOGI(HENSOR_TAG, "Index selected to send: %d; unixtime: %d", lastIndex, currentDatagas.unixtime);
 
-				if (!this->sendOut(currentDatagas)) {
+				hensor->serializeDatagas(serialization, currentDatagas); // serializing again because is another datagas
+				if (!this->sendOut(serialization, this->endpoint.post)) {
 					// Don't try because we didn't reach server
 					break;
 				}

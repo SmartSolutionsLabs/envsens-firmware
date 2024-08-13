@@ -429,6 +429,21 @@ Datagas Hensor::getCurrentDatagas() {
 	return this->currentDatagas;
 }
 
+void Hensor::serializeDatagas(String& serialization, Datagas& datagas) {
+	DateTime dateTime(datagas.unixtime);
+	JsonDocument jsonResponse;
+	jsonResponse["equipo"] = this->deviceName;
+	jsonResponse["fechahora"] = dateTime.timestamp(DateTime::TIMESTAMP_DATE) + " " + dateTime.timestamp(DateTime::TIMESTAMP_TIME);
+	jsonResponse["co2"] = datagas.co2;
+	jsonResponse["nh3"] = datagas.nh3;
+	jsonResponse["temp"] = datagas.temperature;
+	jsonResponse["hr"] = datagas.humidity;
+	jsonResponse["pr"] = datagas.pressure;
+	jsonResponse["pila"] = datagas.battery;
+
+	serializeJson(jsonResponse, serialization);
+}
+
 void Hensor::setSendingOut(bool sending) {
 	digitalWrite(CONFIG_STATUS_LED_PIN, sending ? HIGH : LOW);
 	this->sendingOut = sending;
