@@ -4,6 +4,7 @@
 #include "Datalogger.hpp"
 #include "Thread.hpp"
 #include "Ble.hpp"
+#include "Updater.hpp"
 
 #include <ArduinoQueue.h>
 
@@ -35,6 +36,8 @@ class Communicator : public Thread {
 		uint32_t networkInterval;
 
 		uint32_t localInterval;
+
+		GithubFirmwareUpdater update;
 
 	public:
 		// For singleton
