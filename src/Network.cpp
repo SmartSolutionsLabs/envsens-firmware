@@ -72,7 +72,7 @@ void Network::onAddressed(WiFiEvent_t event, WiFiEventInfo_t info) {
 
 	// Send event to server
 	String response;
-	Communicator::getInstance()->sendOutEvent(100, response);
+	Communicator::getInstance()->sendOutEvent(2, response);
 	Serial.print(response);
 }
 
