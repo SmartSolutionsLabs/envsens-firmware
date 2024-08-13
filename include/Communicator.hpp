@@ -53,6 +53,11 @@ class Communicator : public Thread {
 		bool sendOut(String& body, String& hostname, String& path, String& response);
 
 		/**
+		 * Sends event data to exterior.
+		 */
+		bool sendOutEvent(unsigned int event, String& response);
+
+		/**
 		 * Append an instruction to queue for processing in the thread.
 		 */
 		void addInstruction(String);
