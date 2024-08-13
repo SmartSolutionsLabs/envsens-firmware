@@ -1,0 +1,6 @@
+{
+    "version":"1.0.0",
+    "device":"esp32-s3",
+    "type":"stable",
+    "previousVersion":"0.0.3"
+}
