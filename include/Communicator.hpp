@@ -50,7 +50,7 @@ class Communicator : public Thread {
 		/**
 		 * Sends data to exterior.
 		 */
-		bool sendOut(Datagas& datagas);
+		bool sendOut(String& body, String& endpoint);
 
 		/**
 		 * Append an instruction to queue for processing in the thread.
