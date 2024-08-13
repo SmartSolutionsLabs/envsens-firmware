@@ -1,10 +1,11 @@
 #include "Updater.hpp"
+#include <Arduino.h>
 
 GithubFirmwareUpdater::GithubFirmwareUpdater(void){
     this->initTime = pdTICKS_TO_MS( xTaskGetTickCount() );
 }
 
-bool GithubFirmwareUpdater::checkForUpdatesEveryTime(uint32_t milliseconds) {
+void GithubFirmwareUpdater::checkForUpdatesEveryTime(uint32_t milliseconds) {
     this->currentTime = pdTICKS_TO_MS( xTaskGetTickCount() );
 
     if ((this->currentTime - this->initTime) >= milliseconds){
@@ -21,7 +22,9 @@ void GithubFirmwareUpdater::firmwareUpdate(void) {
     WiFiClientSecure client;
     client.setInsecure();
     httpUpdate.setLedPin(9, LOW);
-    t_httpUpdate_return ret = httpUpdate.update(client, URL_fw_Bin);
+
+    String URL_bin = URL_newFirmware_Bin + this->newFirmwareVersion + "/firmware.bin";
+    t_httpUpdate_return ret = httpUpdate.update(client, URL_bin);
 
     switch(ret){
         case HTTP_UPDATE_FAILED:
@@ -43,7 +46,7 @@ bool GithubFirmwareUpdater::firmwareVersionCheck(void) {
     String payload;
     int httpCode;
     String fwurl = "";
-    fwurl += URL_fw_Version;
+    fwurl += URL_versions;
     fwurl += "?";
     fwurl += String(rand());
     Serial.println(fwurl);
@@ -74,17 +77,24 @@ bool GithubFirmwareUpdater::firmwareVersionCheck(void) {
     }
 
     if (httpCode == HTTP_CODE_OK){
-        payload.trim();
-        Serial.println(payload);
+        //payload.trim();
+        deserializeJson(this->getPayload,payload);
+        String msg = this->getPayload["versions"][0];
+        this->newFirmwareVersion = msg;
+
+        Serial.print("\t --------------- \n \t New Version Get: ");
+        Serial.println(this->newFirmwareVersion);
+        Serial.print("\t --------------- \n");
+
         if (payload.equals(this->firmwareVersion)) {
-            Serial.printf("\nDevice already on latest firmware version:%s\n", FirmwareVer);
+            Serial.printf("\nDevice already on latest firmware version:%s\n", this->firmwareVersion);
             this->newFirmwareVersion = payload;
             return false;
         }
         else
         {
-            this->FirmwareVer = payload;
-            Serial.println(payload);
+            this->newFirmwareVersion = payload;
+            Serial.println(newFirmwareVersion);
             Serial.println("New firmware detected");
             return true;
         }
