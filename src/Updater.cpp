@@ -23,7 +23,12 @@ void GithubFirmwareUpdater::firmwareUpdate(void) {
     client.setInsecure();
     httpUpdate.setLedPin(9, LOW);
 
-    String URL_bin = URL_newFirmware_Bin + this->newFirmwareVersion + "/firmware.bin";
+    String URL_bin = URL_newFirmware_Bin;
+    URL_bin.concat(this->newFirmwareVersion);
+    URL_bin.concat("/firmware.bin");
+    Serial.print("\t  ##########################\n");
+    Serial.println("\t  the new URL IS :\n" + URL_bin );
+    Serial.println("\t   ##########################\n");
     t_httpUpdate_return ret = httpUpdate.update(client, URL_bin);
 
     switch(ret){
