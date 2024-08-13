@@ -39,6 +39,8 @@ class GithubFirmwareUpdater{
 
         bool firmwareVersionCheck(void );
 
+        bool checkForValidVersion(void);
+
         void checkForUpdatesEveryTime(uint32_t milliseconds);
 
         String getNewFirmwareVersion();
