@@ -4,7 +4,7 @@
 #include <WiFi.h>
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
-#include <ElegantOTA.h>
+//#include <ElegantOTA.h>
 
 #ifndef MAX_ATTEMPTS_QUANTITY
 #define MAX_ATTEMPTS_QUANTITY 4
