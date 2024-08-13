@@ -199,7 +199,7 @@ void Communicator::parseIncome(void * data) {
 	Ble::bleCallback->writeLargeText(Ble::resCharacteristic, answer);
 }
 
-bool Communicator::sendOut(String& body, String& hostname, String& path) {
+bool Communicator::sendOut(String& body, String& hostname, String& path, String& response) {
 	if (WiFi.status() != WL_CONNECTED) {
 		return false;
 	}
@@ -230,13 +230,16 @@ bool Communicator::sendOut(String& body, String& hostname, String& path) {
 				break;
 			}
 		}
+
+		// clear the response for new data
+		response = "";
+
 		// if there are incoming bytes available
 		// from the server, read them and print them:
 		while (httpClient.available()) {
-			char c = httpClient.read();
-			Serial.write(c);
+			response.concat(httpClient.read());
 		}
-		Serial.write('\n');
+		response.concat('\n');
 
 		httpClient.stop();
 
@@ -294,13 +297,17 @@ void Communicator::run(void * data) {
 			String serialization;
 			hensor->serializeDatagas(serialization, currentDatagas);
 
-			if (!this->sendOut(serialization, this->endpoint.hostname, this->endpoint.post)) {
+			// Response body from server
+			String response;
+
+			if (!this->sendOut(serialization, this->endpoint.hostname, this->endpoint.post, response)) {
 				// Because it was not sent
 				Datalogger::getInstance()->saveLocalStorageRow(currentDatagas);
 
 				hensor->setSendingOut(false);
 				continue;
 			}
+			Serial.print(response);
 
 			// Try while there is connection
 			uint8_t lastIndex = Datalogger::getInstance()->getLastLocalStorageIndex();
@@ -309,10 +316,11 @@ void Communicator::run(void * data) {
 				ESP_LOGI(HENSOR_TAG, "Index selected to send: %d; unixtime: %d", lastIndex, currentDatagas.unixtime);
 
 				hensor->serializeDatagas(serialization, currentDatagas); // serializing again because is another datagas
-				if (!this->sendOut(serialization, this->endpoint.hostname, this->endpoint.post)) {
+				if (!this->sendOut(serialization, this->endpoint.hostname, this->endpoint.post, response)) {
 					// Don't try because we didn't reach server
 					break;
 				}
+				Serial.print(response);
 
 				Datalogger::getInstance()->cleanLocalStorageRow(lastIndex);
 
