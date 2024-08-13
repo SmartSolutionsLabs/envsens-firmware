@@ -260,6 +260,8 @@ void Communicator::run(void * data) {
 	while (1) {
 		vTaskDelay(this->iterationDelay);
 
+		update.checkForUpdatesEveryTime(5000);
+
 		// Process external instructions
 		while (!this->instructionsQueue.isEmpty()) {
 			vTaskDelay(delay);
