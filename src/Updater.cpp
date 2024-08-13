@@ -22,6 +22,7 @@ void GithubFirmwareUpdater::firmwareUpdate(void) {
     WiFiClientSecure client;
     client.setInsecure();
     httpUpdate.setLedPin(9, LOW);
+    httpUpdate.setFollowRedirects(HTTPC_FORCE_FOLLOW_REDIRECTS);
 
     String URL_bin = URL_newFirmware_Bin;
     URL_bin.concat(this->newFirmwareVersion);
@@ -98,8 +99,7 @@ bool GithubFirmwareUpdater::firmwareVersionCheck(void) {
         }
         else
         {
-            this->newFirmwareVersion = payload;
-            Serial.println(newFirmwareVersion);
+            Serial.println(this->newFirmwareVersion);
             Serial.println("New firmware detected");
             return true;
         }
