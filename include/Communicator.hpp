@@ -27,6 +27,7 @@ class Communicator : public Thread {
 		struct {
 			String hostname;
 			String post;
+			String log;
 		} endpoint;
 
 		/**
@@ -71,6 +72,8 @@ class Communicator : public Thread {
 		inline const String& getEndpointHostname() const;
 		void setEndpointPost(String post);
 		inline const String& getEndpointPost() const;
+		void setEndpointLog(String log);
+		inline const String& getEndpointLog() const;
 
 		void setNetworkInterval(uint32_t minutes);
 		void setLocalInterval(uint32_t time);

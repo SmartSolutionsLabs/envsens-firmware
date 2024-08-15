@@ -218,11 +218,10 @@ bool Communicator::sendOutEvent(unsigned int event, String& response) {
 			break;
 	}
 
-	String path("/logs");
 	String body;
 	serializeJson(jsonResponse, body);
 
-	return this->sendOut(body, this->endpoint.hostname, path, response);
+	return this->sendOut(body, this->endpoint.hostname, this->endpoint.log, response);
 }
 
 bool Communicator::sendOut(String& body, String& hostname, String& path, String& response) {
@@ -377,6 +376,14 @@ void Communicator::setEndpointPost(String newPost) {
 
 inline const String& Communicator::getEndpointPost() const {
 	return this->endpoint.post;
+}
+
+void Communicator::setEndpointLog(String newLog) {
+	this->endpoint.log = newLog;
+}
+
+inline const String& Communicator::getEndpointLog() const {
+	return this->endpoint.log;
 }
 
 void Communicator::setNetworkInterval(uint32_t minutes) {

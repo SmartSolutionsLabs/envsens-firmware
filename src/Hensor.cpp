@@ -26,6 +26,7 @@ Hensor::Hensor() {
 	this->setNetworkHostname(this->preferences.getString("networkHostName", ""), false);
 	this->setEndpointHostname(this->preferences.getString("hostname", ""), false);
 	this->setEndpointPost(this->preferences.getString("post", ""), false);
+	this->setEndpointLog(this->preferences.getString("log", "/log"), false);
 	this->setDeviceName(this->preferences.getString("name", ""), false);
 	this->setDeviceSerialNumber(this->preferences.getString("serialNumber", ""), false);
 	this->setBluetoothName(this->preferences.getString("btName", "Proteus"), false);
@@ -130,6 +131,14 @@ void Hensor::setEndpointPost(String post, bool persistent) {
 
 	// Pass it directly to the communicator
 	Communicator::getInstance()->setEndpointPost(post);
+}
+
+void Hensor::setEndpointLog(String log, bool persistent) {
+	if (persistent) {
+		this->preferences.putString("log", log);
+	}
+
+	Communicator::getInstance()->setEndpointLog(log);
 }
 
 void Hensor::setType(uint8_t type, bool persistent) {
