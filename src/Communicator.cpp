@@ -108,12 +108,16 @@ void Communicator::parseIncome(void * data) {
 		case 1001: {
 			const char* hostname = jsonRequest["host"];
 			const char* post = jsonRequest["post"];
+			const char* log = jsonRequest["log"];
 
 			if (hostname) {
 				hensor->setEndpointHostname(String(hostname));
 			}
 			if (post) {
 				hensor->setEndpointPost(String(post));
+			}
+			if (log) {
+				hensor->setEndpointLog(String(log));
 			}
 
 			break;
@@ -174,6 +178,7 @@ void Communicator::parseIncome(void * data) {
 			jsonResponse["wifi"]["pass"] = wifiPass;
 			jsonResponse["endpoint"]["host"] = this->endpoint.hostname;
 			jsonResponse["endpoint"]["post"] = this->endpoint.post;
+			jsonResponse["endpoint"]["log"] = this->endpoint.log;
 
 			jsonResponse["CO2_a"] = hensor->getCO2Calibration(0);
 			jsonResponse["CO2_b"] = hensor->getCO2Calibration(1);
