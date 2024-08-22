@@ -4,15 +4,12 @@
 #include "Thread.hpp"
 
 #include "FS.h"
+#include "SPIFFS.h"
 #include <ArduinoQueue.h>
-#include <Preferences.h>
+#include <sqlite3.h>
 
-#ifndef DATALOGGER_QUEUE_SIZE_ITEMS
-#define DATALOGGER_QUEUE_SIZE_ITEMS 128
-#endif
-
-#ifndef DATALOGGER_BUF_SIZE
-#define DATALOGGER_BUF_SIZE 4096
+#ifndef FORMAT_SPIFFS_IF_FAILED
+#define FORMAT_SPIFFS_IF_FAILED false
 #endif
 
 void IRAM_ATTR interruptDataSaver(void* arg);
@@ -45,11 +42,6 @@ class Datalogger : public Thread {
 
 		volatile bool saving = false;
 
-		/**
-		 * Store for local data.
-		 */
-		Preferences preferences;
-
 	public:
 		static Datalogger * getInstance();
 		Datalogger(Datalogger &other) = delete;
@@ -58,6 +50,8 @@ class Datalogger : public Thread {
 		esp_timer_handle_t saverTimer = nullptr;
 
 		void run(void* data) override;
+
+		bool createDatabase();
 
 		/**
 		 * Appends a datagas object in queue.
@@ -81,11 +75,6 @@ class Datalogger : public Thread {
 		Datagas readLocalStorageRow(uint8_t index);
 
 		/**
-		 * View the last used index for local storage.
-		 */
-		uint8_t getLastLocalStorageIndex();
-
-		/**
 		 * Remove keys for that index in local storage.
 		 */
 		void cleanLocalStorageRow(uint8_t index);
@@ -95,26 +84,18 @@ class Datalogger : public Thread {
 		 */
 		void acquire(ArduinoQueue<Datagas> &datagasQueue) const;
 
-		FILE * getDatabaseFile() const;
+		sqlite3 * getDatabaseFile() const;
 
-		inline bool tryCard();
+		bool trySpiffs();
 
 		void setSaving(bool saving = true);
 
 		bool isSaving() const;
 
 	private:
-		inline void save();
+		const char * filename = "/spiffs/datagas.db";
 
-		const char * filename = "/sd/datagas.db";
-
-		FILE * databaseFile;
+		sqlite3 * databaseFile;
 };
-
-// Callback headers for Micro Logger API
-int callbackLoggerFlush(struct dblog_write_context *ctx);
-int32_t callbackLoggerWrite(struct dblog_write_context *ctx, void *buf, uint32_t pos, size_t len);
-int32_t callbackLoggerReadReadCtx(struct dblog_read_context *ctx, void *buf, uint32_t pos, size_t len);
-int32_t callbackLoggerReadWriteCtx(struct dblog_write_context *ctx, void *buf, uint32_t pos, size_t len);
 
 #endif

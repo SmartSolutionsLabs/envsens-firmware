@@ -336,7 +336,8 @@ void Communicator::run(void * data) {
 			Serial.print(response);
 
 			// Try while there is connection
-			uint8_t lastIndex = Datalogger::getInstance()->getLastLocalStorageIndex();
+			// TODO: Get chunk to make buffer or get the older for sending
+			uint8_t lastIndex = 0; //Datalogger::getInstance()->getLastLocalStorageIndex();
 			while (lastIndex) {
 				currentDatagas = Datalogger::getInstance()->readLocalStorageRow(lastIndex);
 				ESP_LOGI(HENSOR_TAG, "Index selected to send: %d; unixtime: %d", lastIndex, currentDatagas.unixtime);
