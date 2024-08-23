@@ -35,10 +35,11 @@ bool Datalogger::createDatabase() {
 	char *zErrMsg = 0;
 
 	int rc = sqlite3_exec(this->databaseFile,
-		"CREATE TABLE datagas(unixtime INTEGER NOT NULL, status INTEGER NOT NULL, co2 INTEGER NOT NULL, nh3 INTEGER NOT NULL, temperature REAL NOT NULL, humidity REAL NOT NULL, pressure REAL NOT NULL, battery REAL NOT NULL, PRIMARY KEY (unixtime));",
+		"CREATE TABLE IF NOT EXISTS datagas(unixtime INTEGER NOT NULL, status INTEGER NOT NULL, co2 INTEGER NOT NULL, nh3 INTEGER NOT NULL, temperature REAL NOT NULL, humidity REAL NOT NULL, pressure REAL NOT NULL, battery REAL NOT NULL, PRIMARY KEY (unixtime));",
 		nullptr, nullptr, &zErrMsg);
 
 	if (rc != SQLITE_OK) {
+		ESP_LOGI(HENSOR_TAG, "SQL error: %s", zErrMsg);
 		sqlite3_free(zErrMsg);
 		return false;
 	}
@@ -57,16 +58,19 @@ void Datalogger::run(void * data) {
 }
 
 void Datalogger::saveLocalStorageRow(const Datagas &datagas) {
-	char sqlBuffer[256];
-	static const char * sqlInsertPattern = "INSERT INTO datagas VALUES(%d, %d, %d, %d)";
+	char sqlBuffer[128];
+	static const char * sqlInsertPattern = "INSERT INTO datagas VALUES(%d, %d, %d, %d, %.2f, %.2f, %.2f, %.2f)";
 	sprintf(sqlBuffer, sqlInsertPattern, datagas.unixtime, datagas.co2, datagas.nh3, datagas.temperature, datagas.humidity, datagas.pressure, datagas.battery);
 	char *zErrMsg = 0;
+
+	ESP_LOGI(HENSOR_TAG, "Query: %s", sqlBuffer);
 
 	int rc = sqlite3_exec(this->databaseFile,
 		sqlBuffer,
 		nullptr, nullptr, &zErrMsg);
 
 	if (rc != SQLITE_OK) {
+		ESP_LOGI(HENSOR_TAG, "SQL error: %s", zErrMsg);
 		sqlite3_free(zErrMsg);
 	}
 }
